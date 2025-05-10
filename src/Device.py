@@ -1,11 +1,10 @@
 from lakeshore import Model372
 import InputData
 
-### Singleton of the Lakeshore Model ###
 
+# Singleton of the Lakeshore Model
 
 class Device:
-
     device = None
 
     @staticmethod
