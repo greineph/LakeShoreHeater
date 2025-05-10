@@ -9,6 +9,7 @@ class Channel:
     def __init__(self, device: Model372, input_channel: Model372.InputChannel):
         self.device = device
         self.input_channel = input_channel
+        self.configure_setup_settings()
 
     # returns readings of {kelvin, resistance, power} as dictionary
     def get_readings(self):

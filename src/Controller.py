@@ -3,6 +3,7 @@ import InputData
 from Channel import Channel
 from Device import Device
 
+
 class Controller:
 
     def __init__ (self):
