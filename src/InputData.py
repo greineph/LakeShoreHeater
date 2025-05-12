@@ -18,7 +18,7 @@ AUTO_RANGE_MODE_HEATER = Model372.AutoRangeMode.CURRENT
 CURRENT_SOURCE_SHUNTED_HEATER = False
 # units for sensor of heater (kelvin, ohms)
 UNITS_HEATER = Model372.InputSensorUnits.OHMS
-# measurement input resistance range of heater (MeasurementInputResistance)
+# measurement input resistance range of heater (MeasurementInputResistance, None)
 RESISTANCE_RANGE_HEATER = Model372.MeasurementInputResistance.RANGE_2_OHMS
 
 
@@ -35,7 +35,7 @@ AUTO_RANGE_MODE_THERMOMETER = Model372.AutoRangeMode.CURRENT
 CURRENT_SOURCE_SHUNTED_THERMOMETER = False
 # units for sensor of thermometer (kelvin, ohms)
 UNITS_THERMOMETER = Model372.InputSensorUnits.OHMS
-# measurement input resistance range of thermometer (MeasurementInputResistance)
+# measurement input resistance range of thermometer (MeasurementInputResistance, None)
 RESISTANCE_RANGE_THERMOMETER = Model372.MeasurementInputResistance.RANGE_2_OHMS
 
 # Settings for filter
