@@ -5,7 +5,8 @@ import InputData
 # Singleton of the Lakeshore Model
 
 class Device:
-    device = None
+    type device = Model372
+    # device = None
 
     @staticmethod
     def get_device() -> Model372:

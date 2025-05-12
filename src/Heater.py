@@ -13,5 +13,6 @@ class Heater(Channel):
     def create_input_setup_settings(self):
         return Model372InputSetupSettings(auto_range=InputData.AUTO_RANGE_MODE_THERMOMETER)
 
-    # TODO: clarify which heater to use (sample, warm up, analog, other)
+    # TODO: clarify which heater to use (sample, warm up, analog, other): channel heater for base functionality
+    # other heaters for possible cryopump
     # TODO: clarify which setting "stromstärke" refers to

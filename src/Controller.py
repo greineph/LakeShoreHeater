@@ -10,5 +10,7 @@ class Controller:
         self.heater = Channel(Device.get_device(), InputData.CHANNEL_HEATER)
         self.thermometer = Channel(Device.get_device(), InputData.CHANNEL_THERMOMETER)
 
+    # TODO: set_scanner_status to relevant channel
+
 
 

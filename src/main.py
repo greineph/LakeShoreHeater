@@ -1,4 +1,4 @@
-import Controller
+from Controller import Controller
 
 ### starts the program ###
 
