@@ -2,6 +2,7 @@ from bokeh.core.has_props import abstract
 
 from Device import Device
 from lakeshore import Model372, Model372InputSetupSettings
+import InputData
 
 
 class Channel:
@@ -23,3 +24,10 @@ class Channel:
     @abstract
     def create_input_setup_settings(self) -> Model372InputSetupSettings:
         raise NotImplementedError("Implement this method in subclass")
+
+    # sets the measurement filter for this channel
+    def set_filter(self):
+        self.device.set_filter(input_channel=self.input_channel.value,
+                               state=InputData.STATE_FILTER,
+                               settle_time=InputData.SETTLE_TIME_FILTER,
+                               window=InputData.WINDOW_FILTER)
