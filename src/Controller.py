@@ -10,7 +10,14 @@ class Controller:
         self.heater = Channel(Device.get_device(), InputData.CHANNEL_HEATER)
         self.thermometer = Channel(Device.get_device(), InputData.CHANNEL_THERMOMETER)
 
+    # starts the process
     # TODO: set_scanner_status to relevant channel
 
+    def run(self):
+        return
+
+    # TODO: get readings from multipyvu possibly in new class
+
+    # TODO: behaviour for stopping/exiting
 
 

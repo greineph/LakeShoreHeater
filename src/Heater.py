@@ -19,3 +19,5 @@ class Heater(Channel):
                                           resistance_range=InputData.RESISTANCE_RANGE_HEATER)
 
     # TODO: heaters (sample, warm up, analog, other): channel heater for base functionality other heaters for possible cryopump
+
+    # TODO: enable/disable channel heater
