@@ -20,6 +20,8 @@ CURRENT_SOURCE_SHUNTED_HEATER = False
 UNITS_HEATER = Model372.InputSensorUnits.OHMS
 # measurement input resistance range of heater (MeasurementInputResistance, None)
 RESISTANCE_RANGE_HEATER = Model372.MeasurementInputResistance.RANGE_63_POINT_2_KIL_OHMS
+# list of wanted readings from ["kelvin", "resistance", "power", "quadrature"(not in Control channel)] for heater
+WANTED_READINGS_HEATER = ["kelvin", "resistance", "power", "quadrature"]
 
 
 # Settings of thermometer
@@ -36,7 +38,9 @@ CURRENT_SOURCE_SHUNTED_THERMOMETER = False
 # units for sensor of thermometer (kelvin, ohms)
 UNITS_THERMOMETER = Model372.InputSensorUnits.OHMS
 # measurement input resistance range of thermometer (MeasurementInputResistance, None)
-RESISTANCE_RANGE_THERMOMETER = Model372.MeasurementInputResistance.RANGE_2_OHMS
+RESISTANCE_RANGE_THERMOMETER = Model372.MeasurementInputResistance.RANGE_63_POINT_2_KIL_OHMS
+# list of wanted readings from ["kelvin", "resistance", "power", "quadrature"(not in Control channel)] for thermometer
+WANTED_READINGS_THERMOMETER = ["kelvin", "resistance", "power"]
 
 # Settings for filter
 # turn filter on/off (True, False)
@@ -44,7 +48,7 @@ STATE_FILTER = True
 # settle time of filter in seconds (1-200)
 SETTLE_TIME_FILTER = 5
 # specifies what percent of full scale reading limits the filtering function (1-80)
-WINDOW_FILTER = 20
+WINDOW_FILTER = 10
 
 # TODO: sample rate
 

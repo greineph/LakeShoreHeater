@@ -14,3 +14,7 @@ class Thermometer(Channel):
                                           units=InputData.UNITS_THERMOMETER,
                                           resistance_range=InputData.RESISTANCE_RANGE_THERMOMETER)
 
+    # gets the selected readings from InputData
+    # @override
+    def get_wanted_reading_keys(self) -> list[str]:
+        return InputData.WANTED_READINGS_THERMOMETER

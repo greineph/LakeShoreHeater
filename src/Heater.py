@@ -15,6 +15,11 @@ class Heater(Channel):
                                           units=InputData.UNITS_HEATER,
                                           resistance_range=InputData.RESISTANCE_RANGE_HEATER)
 
+    # gets the selected readings from InputData
+    # @override
+    def get_wanted_reading_keys(self) -> list[str]:
+        return InputData.WANTED_READINGS_HEATER
+
     # TODO: heaters (sample, warm up, analog, other): channel heater for base functionality other heaters for possible cryopump
 
     # TODO: enable/disable channel heater
