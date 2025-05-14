@@ -174,4 +174,4 @@ cython_debug/
 .pypirc
 
 # test files
-test.py
+src/test.py

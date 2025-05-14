@@ -1,5 +1,3 @@
-from xlsxwriter.contenttypes import overrides
-
 from Channel import Channel
 from lakeshore import Model372InputSetupSettings
 import InputData
@@ -8,7 +6,6 @@ import InputData
 class Thermometer(Channel):
 
     # creates input setup settings for thermometer from InputData.py
-    @overrides
     def create_input_setup_settings(self):
         return Model372InputSetupSettings(mode=InputData.SENSOR_EXCITATION_MODE_THERMOMETER,
                                           excitation_range=InputData.EXCITATION_RANGE_THERMOMETER,

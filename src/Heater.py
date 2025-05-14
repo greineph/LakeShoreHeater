@@ -1,5 +1,3 @@
-from xlsxwriter.contenttypes import overrides
-
 from Channel import Channel
 from lakeshore import Model372InputSetupSettings
 import InputData
@@ -9,7 +7,6 @@ from src.InputData import SENSOR_EXCITATION_MODE_HEATER
 class Heater(Channel):
 
     # creates input setup settings for heater from InputData.py
-    @overrides
     def create_input_setup_settings(self):
         return Model372InputSetupSettings(mode=InputData.SENSOR_EXCITATION_MODE_HEATER,
                                           excitation_range=InputData.EXCITATION_RANGE_HEATER,

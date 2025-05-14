@@ -13,3 +13,4 @@ class Device:
             Device.device = Model372(baud_rate=None, ip_address=InputData.IP_ADDRESS)
 
         return Device.device
+
