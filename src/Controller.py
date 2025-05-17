@@ -9,7 +9,7 @@ from src.Thermometer import Thermometer
 
 class Controller:
 
-    def __init__ (self):
+    def __init__(self):
         self.heater = Heater(Device.get_device(), InputData.CHANNEL_HEATER)
         self.thermometer = Thermometer(Device.get_device(), InputData.CHANNEL_THERMOMETER)
         self.datahub = Datahub([self.heater, self.thermometer])
@@ -21,11 +21,8 @@ class Controller:
 
     def start(self):
         print("starting process")
-        self.datahub.log_data(5, 1.5)
-
+        self.datahub.start_logging()
 
     # TODO: get readings from multipyvu possibly in new class
 
     # TODO: behaviour for stopping/exiting
-
-

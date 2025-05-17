@@ -9,7 +9,7 @@ class Channel:
         self.device = device
         self.input_channel = input_channel
         self.configure_setup_settings()
-        #self.set_filter()
+        # self.set_filter()
 
     # returns readings of {kelvin, resistance, power} as dictionary
     def get_readings(self):

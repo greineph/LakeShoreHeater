@@ -50,5 +50,7 @@ SETTLE_TIME_FILTER = 5
 # specifies what percent of full scale reading limits the filtering function (1-80)
 WINDOW_FILTER = 10
 
-# TODO: sample rate
+# Settings for data logging
+# Seconds between logged datapoints
+SAMPLE_RATE = 2
 
