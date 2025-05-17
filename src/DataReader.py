@@ -1,12 +1,12 @@
 import time
 from datetime import datetime
-import threading
+from threading import Thread
 import pandas as pd
 
 from src.Channel import Channel
 
 
-class DataReader(threading.Thread):
+class DataReader(Thread):
 
     def __init__(self, channels: list[Channel], client=None, sample_rate: float = 5):
         super().__init__()

@@ -19,7 +19,7 @@ class Datahub:
             columns += [f"{key}_{ch.get_input_channel().value}" for key in ch.get_wanted_reading_keys()]
         self.df = pd.DataFrame(columns=columns)
 
-    # starts a Thread to continuously read and log data until destroyed
+    # creates a Thread to continuously read and log data until destroyed
     def start_logging(self):
         reader = DataReader(channels=self.channels,
                             client=self.client,
