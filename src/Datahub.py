@@ -29,16 +29,23 @@ class Datahub:
                             sample_rate=InputData.SAMPLE_RATE)
         self.threads.append(reader)
         reader.add_subscriber(self)
-        graph = LiveGraph(datahub=self,
-                          x_axis="timedelta",
-                          y_axis=["resistance_1"])
-        self.threads.append(graph)
-        reader.add_subscriber(graph)
+        # graph = LiveGraph(datahub=self,
+        #                   x_axis="timedelta",
+        #                   y_axis=["resistance_1"])
+        # self.threads.append(graph)
+        # reader.add_subscriber(graph)
         reader.start()
+        # graph.run()
+
+        # for i in range(20):
+        #     print("---------------------------waiting")
+        #     time.sleep(2)
+        #     self.threads[1].update(None)
 
     # writes next free line in self.df with {data}
     def update(self, data):
         self.df.loc[len(self.df)] = data
+        print(data)
 
     # creates a csv file from the current data in self.df to {path} as {name}
     def write_csv(self, name:  str = "out", path: str = "./data"):

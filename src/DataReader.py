@@ -1,12 +1,13 @@
 import time
 from datetime import datetime
-from threading import Thread
+from multiprocessing import Process
 import pandas as pd
 
 from src.Channel import Channel
 
 
-class DataReader(Thread):
+# TODO: dont use thread because they arent actually concurrent :(, use multiprocessing instead
+class DataReader(Process):
 
     def __init__(self, channels: list[Channel], client=None, sample_rate: float = 5):
         super().__init__()
@@ -16,7 +17,6 @@ class DataReader(Thread):
         self.subscribers = []
 
     # TODO: determine how data is supposed to be read in regards to sample_rate
-    # called when this Thread is started
     def run(self):
         start_timestamp = datetime.now()
 
