@@ -5,7 +5,7 @@ import matplotlib.animation as animation
 from matplotlib import style
 
 
-# TODO: possibly doesn't need to be a Thread
+# TODO: cant be a thread because matplotlib is weird
 class LiveGraph:
 
     def __init__(self, datahub, x_axis: str, y_axis: list[str]):
@@ -31,7 +31,7 @@ class LiveGraph:
         # plt.pause(0.2)
         plt.show(block=False)
 
-    # TODO: figure out how to update the graph (is matplotlib animation necessary?)
+    # TODO: update graph in mainloop, add bools for control
     def update(self, data):
         print("updating")
         # df = self.datahub.get_data()

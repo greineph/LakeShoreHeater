@@ -1,2 +1,2 @@
 
-# TODO: Live diagram y: resistance, (temperature); x: time possibly new class/window
+# TODO: gui has to be in a thread because matplotlib has to be in the mainthread :>

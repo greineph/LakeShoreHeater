@@ -6,7 +6,7 @@ import pandas as pd
 from src.Channel import Channel
 
 
-# TODO: dont use thread because they arent actually concurrent :(, use multiprocessing instead
+# TODO: Thread is fine unless performance issues become a thing
 class DataReader(Process):
 
     def __init__(self, channels: list[Channel], client=None, sample_rate: float = 5):
