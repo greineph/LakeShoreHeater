@@ -7,17 +7,20 @@ from Channel import Channel
 from src import InputData
 from src.DataReader import DataReader
 from src.LiveGraph import LiveGraph
+from MPVWrapper import MPVWrapper
 
 
 class Datahub:
 
-    def __init__(self, channels: list[Channel], client=None):
+    def __init__(self, channels: list[Channel], mpv_wrapper: MPVWrapper = None):
         self.channels = channels
-        self.client = client
+        self.mpv_wrapper = mpv_wrapper
 
         columns = ["timestamp", "timedelta"]
         for ch in self.channels:
             columns += [f"{key}_{ch.get_input_channel().value}" for key in ch.get_wanted_reading_keys()]
+        if self.mpv_wrapper:
+            columns += mpv_wrapper.get_wanted_reading_keys()
         self.df = pd.DataFrame(columns=columns)
 
         self.reader = None
@@ -26,13 +29,13 @@ class Datahub:
     # creates Threads to continuously read, log and show data until destroyed
     def start_logging(self):
         self.reader = DataReader(channels=self.channels,
-                                 client=self.client,
+                                 mpv_wrapper=self.mpv_wrapper,
                                  sample_rate=InputData.SAMPLE_RATE)
         self.reader.daemon = True
         self.reader.add_subscriber(self)
         self.graph = LiveGraph(datahub=self,
                                x_axis="timedelta",
-                               y_axis=["kelvin_1", "resistance_1", "power_1", "quadrature_1"])
+                               y_axis=["temperature", "field"])
         self.reader.start()
         self.graph.initialize()
 

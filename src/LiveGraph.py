@@ -7,6 +7,8 @@ from matplotlib import style
 
 class LiveGraph:
 
+    # TODO: maybe reference DataFrame instead of datahub for data gathering,
+    #       FuncAnimation might actually work better idk yet
     def __init__(self, datahub, x_axis: str, y_axis: list[str]):
         super().__init__()
         self.datahub = datahub
@@ -23,14 +25,14 @@ class LiveGraph:
         style.use("seaborn-v0_8-whitegrid")
         self.fig = plt.figure()
         ax = self.fig.add_subplot(111)
-        plt.ylim(0, 3000)
+        plt.ylim(0, 400)
         plt.xlim(0, 10)
         plt.ion()
         for y in self.y_axis:
             ln, = ax.plot([], [])
             self.lines.append(ln)
-        self.lines[2].set_visible(False)
         ax.legend(self.y_axis)
+        plt.tight_layout()
         plt.pause(0.2)
 
     # TODO: update graph in mainloop, add bools for control
@@ -45,9 +47,7 @@ class LiveGraph:
             y_vals = df[self.y_axis[i]].tolist()[:val_len]
             self.lines[i].set_xdata(x_vals)
             self.lines[i].set_ydata(y_vals)
-        # self.ln.set_xdata(x_vals)
-        # self.ln.set_ydata(y_vals)
-        plt.xlim(x_vals[0], x_vals[-1])
+        plt.xlim(x_vals[0], max(10, x_vals[-1]))
         # plt.ylim(0, max(y_vals))
         self.fig.canvas.draw()
         self.fig.canvas.flush_events()

@@ -20,7 +20,7 @@ CURRENT_SOURCE_SHUNTED_HEATER = False
 UNITS_HEATER = Model372.InputSensorUnits.OHMS
 # measurement input resistance range of heater (MeasurementInputResistance, None)
 RESISTANCE_RANGE_HEATER = Model372.MeasurementInputResistance.RANGE_63_POINT_2_KIL_OHMS
-# list of wanted readings from ["kelvin", "resistance", "power", "quadrature"(not in Control channel)] for heater
+# list of wanted readings ["kelvin", "resistance", "power", "quadrature"(not in Control channel)] for heater
 WANTED_READINGS_HEATER = ["kelvin", "resistance", "power", "quadrature"]
 
 
@@ -39,8 +39,16 @@ CURRENT_SOURCE_SHUNTED_THERMOMETER = False
 UNITS_THERMOMETER = Model372.InputSensorUnits.OHMS
 # measurement input resistance range of thermometer (MeasurementInputResistance, None)
 RESISTANCE_RANGE_THERMOMETER = Model372.MeasurementInputResistance.RANGE_63_POINT_2_KIL_OHMS
-# list of wanted readings from ["kelvin", "resistance", "power", "quadrature"(not in Control channel)] for thermometer
+# list of wanted readings ["kelvin", "resistance", "power", "quadrature"(not in Control channel)] for thermometer
 WANTED_READINGS_THERMOMETER = ["kelvin", "resistance", "power"]
+
+
+# Settings for MPV
+# whether to use mpv client
+MPV_ENABLED = True
+# list of wanted readings ["field", "temperature"] for mpv client
+WANTED_READINGS_MPV = ["field", "temperature"]
+# TODO: do more settings
 
 # Settings for filter
 # turn filter on/off (True, False)
