@@ -20,29 +20,27 @@ class Datahub:
             columns += [f"{key}_{ch.get_input_channel().value}" for key in ch.get_wanted_reading_keys()]
         self.df = pd.DataFrame(columns=columns)
 
-        self.threads = []
+        self.reader = None
+        self.graph = None
 
     # creates Threads to continuously read, log and show data until destroyed
     def start_logging(self):
-        reader = DataReader(channels=self.channels,
-                            client=self.client,
-                            sample_rate=InputData.SAMPLE_RATE)
-        self.threads.append(reader)
-        reader.add_subscriber(self)
-        # graph = LiveGraph(datahub=self,
-        #                   x_axis="timedelta",
-        #                   y_axis=["resistance_1"])
-        # self.threads.append(graph)
-        # reader.add_subscriber(graph)
-        reader.start()
-        # graph.run()
+        self.reader = DataReader(channels=self.channels,
+                                 client=self.client,
+                                 sample_rate=InputData.SAMPLE_RATE)
+        self.reader.daemon = True
+        self.reader.add_subscriber(self)
+        self.graph = LiveGraph(datahub=self,
+                               x_axis="timedelta",
+                               y_axis=["kelvin_1", "resistance_1", "power_1", "quadrature_1"])
+        self.reader.start()
+        self.graph.initialize()
 
-        # for i in range(20):
-        #     print("---------------------------waiting")
-        #     time.sleep(2)
-        #     self.threads[1].update(None)
+        while True:
+            time.sleep(0.1)
+            self.graph.update()
 
-    # writes next free line in self.df with {data}
+    # appends {data} to self.df
     def update(self, data):
         self.df.loc[len(self.df)] = data
         print(data)
