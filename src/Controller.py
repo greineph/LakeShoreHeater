@@ -5,12 +5,14 @@ from src.Device import Device
 from src.Datahub import Datahub
 from src.Heater import Heater
 from src.Thermometer import Thermometer
+from src.Channel import Channel, ChannelSettings
 from MPVWrapper import MPVWrapper
 
 
 class Controller:
 
     def __init__(self):
+        self.channels = []
         self.heater = Heater(Device.get_device(), InputData.CHANNEL_HEATER)
         self.thermometer = Thermometer(Device.get_device(), InputData.CHANNEL_THERMOMETER)
         self.mpv_wrapper = None
@@ -28,6 +30,9 @@ class Controller:
             print("something went wrong")
             self.datahub.write_csv(name="emergency_out")
 
-    # TODO: get readings from multipyvu possibly in new class
+    def create_channel(self, settings: ChannelSettings):
+        self.channels.append(settings.create_channel(Device.get_device()))
+        print(self.channels)
+
 
     # TODO: behaviour for stopping/exiting
