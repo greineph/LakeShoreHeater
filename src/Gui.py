@@ -46,7 +46,7 @@ class Gui(qtw.QWidget):
 
         form_holder2 = qtw.QWidget()
         form_holder_holder.layout().addWidget(form_holder2)
-        self.load_channel_settings_form(form_holder2)
+        self.load_channel_settings_form(form_holder2, index=1)
 
         form_holder3 = qtw.QWidget()
         form_holder_holder.layout().addWidget(form_holder3)
@@ -91,7 +91,7 @@ class Gui(qtw.QWidget):
 
         self.show()
 
-    def load_channel_settings_form(self, parent):
+    def load_channel_settings_form(self, parent, index=0):
         form_layout = qtw.QFormLayout()
         parent.setLayout(form_layout)
 
@@ -103,6 +103,7 @@ class Gui(qtw.QWidget):
         channel.addItem("Channel 2", Model372.InputChannel.TWO)
         channel.addItem("Channel 3", Model372.InputChannel.THREE)
         channel.addItem("Channel 4", Model372.InputChannel.FOUR)
+        channel.setCurrentIndex(index)
         form_layout.addRow(channel)
         channel_form["channel"] = channel
 
@@ -218,8 +219,9 @@ class Gui(qtw.QWidget):
                                                resistance_range=channel_form["resistance_range"].currentData(),
                                                readings=readings)
             print(channel_settings)
-            # self.controller.create_channel(channel_settings)
-            print(channel_settings.create_channel(Device.get_device()))
+            self.controller.create_channel(channel_settings)
+            # print(channel_settings.create_channel(Device.get_device()))
+        self.close()
 
 
 
@@ -231,11 +233,12 @@ def __clicked__(label, text, text_box):
     text_box.setText("you press?")
 
 
-def show_gui():
+def show_gui(controller=None):
     app = qtw.QApplication(sys.argv)
-    gui = Gui()
+    gui = Gui(controller)
     app.exec_()
 
 
-# t = Thread(target=show_gui())
-show_gui()
+if __name__ == "__main__":
+    # t = Thread(target=show_gui())
+    show_gui()

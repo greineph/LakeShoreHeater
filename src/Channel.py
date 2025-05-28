@@ -37,6 +37,7 @@ class Channel:
                                settle_time=InputData.SETTLE_TIME_FILTER,
                                window=InputData.WINDOW_FILTER)
 
+    # [deprecated] kinda
     # gets the selected readings from InputData
     # @abstract
     def get_wanted_reading_keys(self) -> list[str]:
@@ -44,7 +45,7 @@ class Channel:
 
     def get_wanted_readings(self) -> list:
         readings = self.get_readings()
-        return [readings[key] for key in self.get_wanted_reading_keys()]
+        return [readings[key] for key in self.wanted_reading_keys]
 
     def get_input_channel(self):
         return self.input_channel

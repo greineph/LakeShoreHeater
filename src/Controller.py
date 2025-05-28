@@ -7,18 +7,21 @@ from src.Heater import Heater
 from src.Thermometer import Thermometer
 from src.Channel import Channel, ChannelSettings
 from MPVWrapper import MPVWrapper
+import src.Gui as Gui
 
 
 class Controller:
 
     def __init__(self):
         self.channels = []
-        self.heater = Heater(Device.get_device(), InputData.CHANNEL_HEATER)
-        self.thermometer = Thermometer(Device.get_device(), InputData.CHANNEL_THERMOMETER)
+        print(self)
+        Gui.show_gui(self)
+        # self.heater = Heater(Device.get_device(), InputData.CHANNEL_HEATER)
+        # self.thermometer = Thermometer(Device.get_device(), InputData.CHANNEL_THERMOMETER)
         self.mpv_wrapper = None
         if InputData.MPV_ENABLED:
             self.mpv_wrapper = MPVWrapper()
-        self.datahub = Datahub(channels=[self.heater, self.thermometer], mpv_wrapper=self.mpv_wrapper)
+        self.datahub = Datahub(channels=self.channels, mpv_wrapper=self.mpv_wrapper)
 
     # starts the process
     # TODO: set_scanner_status to relevant channel
@@ -31,6 +34,7 @@ class Controller:
             self.datahub.write_csv(name="emergency_out")
 
     def create_channel(self, settings: ChannelSettings):
+        print("creating")
         self.channels.append(settings.create_channel(Device.get_device()))
         print(self.channels)
 

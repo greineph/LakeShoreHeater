@@ -18,7 +18,7 @@ class Datahub:
 
         columns = ["timestamp", "timedelta"]
         for ch in self.channels:
-            columns += [f"{key}_{ch.get_input_channel().value}" for key in ch.get_wanted_reading_keys()]
+            columns += ch.wanted_reading_names
         if self.mpv_wrapper:
             columns += mpv_wrapper.get_wanted_reading_keys()
         self.df = pd.DataFrame(columns=columns)
@@ -33,9 +33,15 @@ class Datahub:
                                  sample_rate=InputData.SAMPLE_RATE)
         self.reader.daemon = True
         self.reader.add_subscriber(self)
+
+        plotting_names = []
+        for ch in self.channels:
+            plotting_names += ch.wanted_plotting_names
+        plotting_names += ["temperature", "field"]
         self.graph = LiveGraph(datahub=self,
                                x_axis="timedelta",
-                               y_axis=["temperature", "field"])
+                               y_axis=plotting_names)
+
         self.reader.start()
         self.graph.initialize()
 
