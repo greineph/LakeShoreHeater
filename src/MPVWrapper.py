@@ -19,6 +19,7 @@ class MPVWrapper:
     def configure_settings(self, path) -> None:
         pass
 
+    # TODO: maybe dont open/close client every time, disable logs of mpv somehow
     def get_wanted_readings(self) -> list:
         readings = []
         self.client.open()
