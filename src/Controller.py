@@ -6,7 +6,7 @@ from src.Datahub import Datahub
 from src.Heater import Heater
 from src.Thermometer import Thermometer
 from src.Channel import Channel, ChannelSettings
-from MPVWrapper import MPVWrapper
+from MPVWrapper import MPVWrapper, MPVSettings
 import src.Gui as Gui
 
 
@@ -34,9 +34,10 @@ class Controller:
             self.datahub.write_csv(name="emergency_out")
 
     def create_channel(self, settings: ChannelSettings):
-        print("creating")
         self.channels.append(settings.create_channel(Device.get_device()))
-        print(self.channels)
+
+    def create_mpv_wrapper(self, settings: MPVSettings):
+        self.mpv_wrapper = settings.create_mpv_wrapper()
 
 
     # TODO: behaviour for stopping/exiting

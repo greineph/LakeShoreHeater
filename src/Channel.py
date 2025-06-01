@@ -54,7 +54,8 @@ class Channel:
 # holds and processes all the relevant data defined in the settings menu
 class ChannelSettings:
 
-    def __init__(self, channel, excitation_mode, excitation_range, auto_range, shunted, units, resistance_range, readings):
+    def __init__(self, channel, excitation_mode, excitation_range, auto_range, shunted, units, resistance_range,
+                 readings):
         self.channel = channel
         self.excitation_mode = excitation_mode
         self.excitation_range = excitation_range
@@ -73,20 +74,13 @@ class ChannelSettings:
                                           resistance_range=self.resistance_range)
 
     def create_channel(self, device) -> Channel:
-        print("creating channel")
         channel = Channel(device=device, input_channel=self.channel)
-        print("configuring settings")
         channel.configure_setup_settings(self.create_input_setup_settings())
-        print("setting wanted stuff")
         channel.wanted_reading_keys = [reading["reading"] for reading in self.readings]
-        print("keys")
         channel.wanted_reading_names = [reading["custom_name"] for reading in self.readings]
-        print("names")
         channel.wanted_plotting_names = [reading["custom_name"] for reading in self.readings if reading["plot"]]
-        print("done")
 
         return channel
-
 
     def __str__(self):
         return (f"{self.channel}: {self.excitation_mode}: {self.excitation_range}: {self.auto_range}: {self.shunted}: "

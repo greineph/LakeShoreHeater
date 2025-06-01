@@ -2,9 +2,11 @@ import time
 from threading import Thread
 from PyQt5 import QtWidgets as qtw
 from PyQt5 import QtGui as qtg
+from PyQt5.QtCore import Qt
 import sys
 from InputData import range_text_converter
 from Channel import ChannelSettings
+from MPVWrapper import MPVSettings
 
 from UliEngineering.Electronics.Resistors import resistor_tolerance
 from lakeshore import Model372
@@ -32,8 +34,11 @@ class Gui(qtw.QWidget):
 
         self.setFont(qtg.QFont("Helvetica", 16))
 
-        label = qtw.QLabel("label testering")
-        label.setFont(qtg.QFont("Helvetica", 30))
+        label = qtw.QLabel("Settings")
+        title_font = qtg.QFont("Helvetica", 30)
+        title_font.setBold(True)
+        label.setFont(title_font)
+        label.setAlignment(Qt.AlignCenter)
         self.layout().addWidget(label)
 
         form_holder_holder = qtw.QWidget()
@@ -95,6 +100,9 @@ class Gui(qtw.QWidget):
         form_layout = qtw.QFormLayout()
         parent.setLayout(form_layout)
 
+        title = qtw.QLabel("Lakeshore Settings")
+        form_layout.addRow(title)
+
         channel_form = {}
 
         channel = qtw.QComboBox(parent)
@@ -142,11 +150,12 @@ class Gui(qtw.QWidget):
         form_layout.addRow("Resistance Range:", resistance_range)
         channel_form["resistance_range"] = resistance_range
 
-        channel_form["readings"] = self.load_wanted_readings_checkboxes(form_layout, ["kelvin", "resistance", "power", "quadrature"])
+        channel_form["readings"] = self.load_wanted_readings_checkboxes(form_layout,
+                                                                        ["kelvin", "resistance", "power", "quadrature"])
 
         self.channel_forms.append(channel_form)
 
-
+        # TODO: possibly change selectable ranges if channel is Control or not
         def on_channel_changed(value=0):
             print(value)
 
@@ -183,12 +192,12 @@ class Gui(qtw.QWidget):
 
             rows.append(row)
 
-
             def on_change(state: bool, box: qtw.QCheckBox, name: qtw.QLineEdit):
                 box.setDisabled(not state)
                 name.setDisabled((not state))
 
-            box_reading.stateChanged.connect(lambda s=box_reading.isChecked(), b=box_plot, n=custom_name: on_change(s, b, n))
+            box_reading.stateChanged.connect(
+                lambda s=box_reading.isChecked(), b=box_plot, n=custom_name: on_change(s, b, n))
 
         return rows
 
@@ -196,7 +205,14 @@ class Gui(qtw.QWidget):
         form_layout = qtw.QFormLayout()
         parent.setLayout(form_layout)
 
-        self.load_wanted_readings_checkboxes(form_layout, ["field", "temperature"])
+        title = qtw.QLabel("MPV Settings")
+        form_layout.addRow(title)
+
+        mpv_form = {}
+
+        mpv_form["readings"] = self.load_wanted_readings_checkboxes(form_layout, ["field", "temperature"])
+
+        self.mpv_form = mpv_form
 
     def submit_forms(self):
         print("submitting")
@@ -221,10 +237,20 @@ class Gui(qtw.QWidget):
             print(channel_settings)
             self.controller.create_channel(channel_settings)
             # print(channel_settings.create_channel(Device.get_device()))
+
+        mpv_readings = []
+        for reading in self.mpv_form["readings"]:
+            if reading["log"].isChecked():
+                custom_name = reading["custom_name"].text()
+                custom_name = custom_name if len(custom_name) > 0 else reading["custom_name"].placeholderText()
+                mpv_readings.append({"reading": reading["reading"],
+                                     "plot": reading["plot"].isChecked(),
+                                     "custom_name": custom_name})
+
+        mpv_settings = MPVSettings(readings=mpv_readings)
+        self.controller.create_mpv_wrapper(mpv_settings)
+
         self.close()
-
-
-
 
 
 def __clicked__(label, text, text_box):
@@ -239,6 +265,7 @@ def show_gui(controller=None):
     app.exec_()
 
 
+# just for testing ui
 if __name__ == "__main__":
     # t = Thread(target=show_gui())
     show_gui()
