@@ -9,11 +9,11 @@ from src.MPVWrapper import MPVWrapper
 
 class DataReader(threading.Thread):
 
-    def __init__(self, channels: list[Channel], mpv_wrapper: MPVWrapper = None, sample_rate: float = 5):
+    def __init__(self, channels: list[Channel], mpv_wrapper: MPVWrapper = None, logging_interval: float = 5):
         super().__init__()
         self.channels = channels
         self.mpv_wrapper = mpv_wrapper
-        self.sample_rate = sample_rate
+        self.logging_interval = logging_interval
         self.subscribers = []
         self.is_running = False
 
@@ -28,7 +28,7 @@ class DataReader(threading.Thread):
             if self.mpv_wrapper:
                 row += self.mpv_wrapper.get_wanted_readings()
             self.notify_subscribers(data=row)
-            time.sleep(self.sample_rate)
+            time.sleep(self.logging_interval)
 
     # Observer-pattern:
     def add_subscriber(self, subscriber):

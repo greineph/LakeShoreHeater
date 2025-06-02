@@ -45,3 +45,4 @@ class MPVSettings:
         mpv_wrapper.wanted_reading_keys = [reading["reading"] for reading in self.readings]
         mpv_wrapper.wanted_reading_names = [reading["custom_name"] for reading in self.readings]
         mpv_wrapper.wanted_plotting_names = [reading["custom_name"] for reading in self.readings if reading["plot"]]
+        return mpv_wrapper

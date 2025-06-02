@@ -26,6 +26,7 @@ class Gui(qtw.QWidget):
 
         self.channel_forms = []
         self.mpv_form = {}
+        self.logging_form = {}
 
         # self.setGeometry(100, 100, 600, 400)
         self.setWindowTitle("Setup")
@@ -56,6 +57,10 @@ class Gui(qtw.QWidget):
         form_holder3 = qtw.QWidget()
         form_holder_holder.layout().addWidget(form_holder3)
         self.load_mpv_settings_form(form_holder3)
+
+        form_holder4 = qtw.QWidget()
+        form_holder_holder.layout().addWidget(form_holder4)
+        self.load_logging_settings_form(form_holder4)
 
         submit_btn = qtw.QPushButton("Submit")
         submit_btn.clicked.connect(self.submit_forms)
@@ -153,11 +158,25 @@ class Gui(qtw.QWidget):
         channel_form["readings"] = self.load_wanted_readings_checkboxes(form_layout,
                                                                         ["kelvin", "resistance", "power", "quadrature"])
 
+        quadrature_boxes = channel_form["readings"][3]
+        if channel.currentIndex() == 0:
+            quadrature_boxes["log"].setEnabled(False)
+            quadrature_boxes["plot"].setEnabled(False)
+            quadrature_boxes["custom_name"].setEnabled(False)
+
         self.channel_forms.append(channel_form)
 
         # TODO: possibly change selectable ranges if channel is Control or not
         def on_channel_changed(value=0):
-            print(value)
+            quadrature_boxes = channel_form["readings"][3]
+            if value == 0 and quadrature_boxes["log"].isEnabled():
+                quadrature_boxes["log"].setEnabled(False)
+                quadrature_boxes["plot"].setEnabled(False)
+                quadrature_boxes["custom_name"].setEnabled(False)
+            elif value != 0 and not quadrature_boxes["log"].isEnabled():
+                quadrature_boxes["log"].setEnabled(True)
+                quadrature_boxes["plot"].setEnabled(True)
+                quadrature_boxes["custom_name"].setEnabled(True)
 
         channel.currentIndexChanged.connect(on_channel_changed)
 
@@ -214,12 +233,31 @@ class Gui(qtw.QWidget):
 
         self.mpv_form = mpv_form
 
+    def load_logging_settings_form(self, parent):
+        form_layout = qtw.QFormLayout()
+        parent.setLayout(form_layout)
+
+        title = qtw.QLabel("Logging Settings")
+        form_layout.addRow(title)
+
+        logging_form = {}
+
+        interval = qtw.QDoubleSpinBox()
+        interval.setValue(2)
+        interval.setRange(1, 100)
+        interval.setSingleStep(1)
+        interval.setSuffix("s")
+        form_layout.addWidget(interval)
+        logging_form["interval"] = interval
+
+        self.logging_form = logging_form
+
     def submit_forms(self):
         print("submitting")
         for channel_form in self.channel_forms:
             readings = []
             for reading in channel_form["readings"]:
-                if reading["log"].isChecked():
+                if reading["log"].isChecked() and reading["log"].isEnabled():
                     custom_name = reading["custom_name"].text()
                     custom_name = custom_name if len(custom_name) > 0 else reading["custom_name"].placeholderText()
                     readings.append({"reading": reading["reading"],
@@ -250,6 +288,9 @@ class Gui(qtw.QWidget):
         mpv_settings = MPVSettings(readings=mpv_readings)
         self.controller.create_mpv_wrapper(mpv_settings)
 
+        self.controller.logging_interval = self.logging_form["interval"].value()
+
+        self.controller.ready = True
         self.close()
 
 

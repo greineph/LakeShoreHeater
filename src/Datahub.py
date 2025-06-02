@@ -20,24 +20,24 @@ class Datahub:
         for ch in self.channels:
             columns += ch.wanted_reading_names
         if self.mpv_wrapper:
-            columns += mpv_wrapper.get_wanted_reading_keys()
+            columns += mpv_wrapper.wanted_reading_names
         self.df = pd.DataFrame(columns=columns)
 
         self.reader = None
         self.graph = None
 
     # creates Threads to continuously read, log and show data until destroyed
-    def start_logging(self):
+    def start_logging(self, logging_interval=5):
         self.reader = DataReader(channels=self.channels,
                                  mpv_wrapper=self.mpv_wrapper,
-                                 sample_rate=InputData.SAMPLE_RATE)
+                                 logging_interval=logging_interval)
         self.reader.daemon = True
         self.reader.add_subscriber(self)
 
         plotting_names = []
         for ch in self.channels:
             plotting_names += ch.wanted_plotting_names
-        plotting_names += ["temperature", "field"]
+        plotting_names += self.mpv_wrapper.wanted_plotting_names
         self.graph = LiveGraph(datahub=self,
                                x_axis="timedelta",
                                y_axis=plotting_names)

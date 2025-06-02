@@ -79,7 +79,6 @@ class ChannelSettings:
         channel.wanted_reading_keys = [reading["reading"] for reading in self.readings]
         channel.wanted_reading_names = [reading["custom_name"] for reading in self.readings]
         channel.wanted_plotting_names = [reading["custom_name"] for reading in self.readings if reading["plot"]]
-
         return channel
 
     def __str__(self):
