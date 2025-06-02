@@ -1,5 +1,6 @@
 import time
 from threading import Thread
+import json
 from PyQt5 import QtWidgets as qtw
 from PyQt5 import QtGui as qtg
 from PyQt5.QtCore import Qt
@@ -10,8 +11,6 @@ from MPVWrapper import MPVSettings
 
 from UliEngineering.Electronics.Resistors import resistor_tolerance
 from lakeshore import Model372
-
-from src.Device import Device
 
 
 # TODO: gui has to be in a thread because matplotlib has to be in the mainthread :>
@@ -65,6 +64,14 @@ class Gui(qtw.QWidget):
         submit_btn = qtw.QPushButton("Submit")
         submit_btn.clicked.connect(self.submit_forms)
         self.layout().addWidget(submit_btn)
+
+        save_btn = qtw.QPushButton("Save")
+        save_btn.clicked.connect(self.save_settings)
+        self.layout().addWidget(save_btn)
+
+        import_btn = qtw.QPushButton("Import")
+        import_btn.clicked.connect(self.import_settings)
+        self.layout().addWidget(import_btn)
 
         # entry = qtw.QLineEdit("default")
         # entry.setObjectName("name_field")
@@ -247,7 +254,7 @@ class Gui(qtw.QWidget):
         interval.setRange(1, 100)
         interval.setSingleStep(1)
         interval.setSuffix("s")
-        form_layout.addWidget(interval)
+        form_layout.addRow("interval:", interval)
         logging_form["interval"] = interval
 
         self.logging_form = logging_form
@@ -293,11 +300,76 @@ class Gui(qtw.QWidget):
         self.controller.ready = True
         self.close()
 
+    def save_settings(self):
+        settings = {"channels": [],
+                    "mpv": None,
+                    "logging": None}
 
-def __clicked__(label, text, text_box):
-    label.setText(text)
-    label.adjustSize()
-    text_box.setText("you press?")
+        for channel_form in self.channel_forms:
+            readings = []
+            for reading in channel_form["readings"]:
+                readings.append({"reading": reading["reading"],
+                                 "log": reading["log"].isChecked(),
+                                 "plot": reading["plot"].isChecked(),
+                                 "custom_name": reading["custom_name"].text()})
+
+            settings["channels"].append({"channel": channel_form["channel"].currentIndex(),
+                                         "excitation_mode": channel_form["excitation_mode"].currentIndex(),
+                                         "excitation_range": channel_form["excitation_range"].currentIndex(),
+                                         "auto_range": channel_form["auto_range"].currentIndex(),
+                                         "shunted": channel_form["shunted"].isChecked(),
+                                         "units": channel_form["units"].currentIndex(),
+                                         "resistance_range": channel_form["resistance_range"].currentIndex(),
+                                         "readings": readings})
+
+        mpv_readings = []
+        for reading in self.mpv_form["readings"]:
+            mpv_readings.append({"reading": reading["reading"],
+                                 "log": reading["log"].isChecked(),
+                                 "plot": reading["plot"].isChecked(),
+                                 "custom_name": reading["custom_name"].text()})
+
+        settings["mpv"] = {"readings": mpv_readings}
+
+        settings["logging"] = {"interval": self.logging_form["interval"].value()}
+
+        with open("..\settings\default.json", "w") as file:
+            s = json.dumps(settings, indent=4)
+            file.write(s)
+
+    def import_settings(self):
+        with open("..\settings\default.json", "r") as file:
+            s = "".join(file.readlines())
+            settings = json.loads(s)
+
+        for i in range(len(settings["channels"])):
+            channel_form = self.channel_forms[i]
+            channel_settings = settings["channels"][i]
+            channel_form["channel"].setCurrentIndex(channel_settings["channel"])
+            channel_form["excitation_mode"].setCurrentIndex(channel_settings["excitation_mode"])
+            channel_form["excitation_range"].setCurrentIndex(channel_settings["excitation_range"])
+            channel_form["auto_range"].setCurrentIndex(channel_settings["auto_range"])
+            channel_form["shunted"].setChecked(channel_settings["shunted"])
+            channel_form["units"].setCurrentIndex(channel_settings["units"])
+            channel_form["resistance_range"].setCurrentIndex(channel_settings["resistance_range"])
+            for j in range(len(channel_settings["readings"])):
+                reading_settings = channel_settings["readings"][j]
+                reading_form = channel_form["readings"][j]
+                reading_form["log"].setChecked(reading_settings["log"])
+                reading_form["plot"].setChecked(reading_settings["plot"])
+                reading_form["custom_name"].setText(reading_settings["custom_name"])
+
+        mpv_form = self.mpv_form
+        mpv_settings = settings["mpv"]
+        for i in range(len(mpv_settings["readings"])):
+            reading_settings = mpv_settings["readings"][i]
+            reading_form = mpv_form["readings"][i]
+            reading_form["log"].setChecked(reading_settings["log"])
+            reading_form["plot"].setChecked(reading_settings["plot"])
+            reading_form["custom_name"].setText(reading_settings["custom_name"])
+
+        self.logging_form["interval"].setValue(settings["logging"]["interval"])
+
 
 
 def show_gui(controller=None):
