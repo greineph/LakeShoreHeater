@@ -7,8 +7,6 @@ from matplotlib import style
 
 class LiveGraph:
 
-    # TODO: maybe reference DataFrame instead of datahub for data gathering,
-    #       FuncAnimation might actually work better idk yet
     def __init__(self, datahub, x_axis: str, y_axis: list[str]):
         super().__init__()
         self.datahub = datahub
@@ -19,7 +17,6 @@ class LiveGraph:
         self.lines: list[plt.Line2D] = []
 
     # TODO: initialize plot style and labels and stuff
-    #       put this in init probably
     def initialize(self):
         df = self.datahub.get_data()
         style.use("seaborn-v0_8-whitegrid")

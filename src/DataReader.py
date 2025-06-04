@@ -40,3 +40,7 @@ class DataReader(threading.Thread):
     def notify_subscribers(self, data):
         for subscriber in self.subscribers:
             subscriber.update(data)
+
+    # stops the reader
+    def stop(self):
+        self.is_running = False

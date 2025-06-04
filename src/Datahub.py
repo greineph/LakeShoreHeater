@@ -37,7 +37,8 @@ class Datahub:
         plotting_names = []
         for ch in self.channels:
             plotting_names += ch.wanted_plotting_names
-        plotting_names += self.mpv_wrapper.wanted_plotting_names
+        if self.mpv_wrapper:
+            plotting_names += self.mpv_wrapper.wanted_plotting_names
         self.graph = LiveGraph(datahub=self,
                                x_axis="timedelta",
                                y_axis=plotting_names)

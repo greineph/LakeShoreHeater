@@ -1,3 +1,4 @@
+import os
 import time
 from threading import Thread
 import json
@@ -16,7 +17,7 @@ from lakeshore import Model372
 # TODO: gui has to be in a thread because matplotlib has to be in the mainthread :>
 #   maybe make gui main thread and put graph/ datahub in process or this in process idk
 #   or if possible implement matplot graph into ui so everything works ._.
-class Gui(qtw.QWidget):
+class SettingsGui(qtw.QWidget):
 
     def __init__(self, controller=None):
         super().__init__()
@@ -26,6 +27,8 @@ class Gui(qtw.QWidget):
         self.channel_forms = []
         self.mpv_form = {}
         self.logging_form = {}
+
+        self.filename = "default.json"
 
         # self.setGeometry(100, 100, 600, 400)
         self.setWindowTitle("Setup")
@@ -127,6 +130,9 @@ class Gui(qtw.QWidget):
         form_layout.addRow(channel)
         channel_form["channel"] = channel
 
+        # TODO: Temperature calibration (steal from lakeshoredatalogger)
+
+        # TODO: change range depending on mode
         excitation_mode = qtw.QComboBox(parent)
         excitation_mode.addItem("current", Model372.SensorExcitationMode.CURRENT)
         excitation_mode.addItem("voltage", Model372.SensorExcitationMode.VOLTAGE)
@@ -300,6 +306,7 @@ class Gui(qtw.QWidget):
         self.controller.ready = True
         self.close()
 
+    # TODO: fix filepath
     def save_settings(self):
         settings = {"channels": [],
                     "mpv": None,
@@ -333,15 +340,24 @@ class Gui(qtw.QWidget):
 
         settings["logging"] = {"interval": self.logging_form["interval"].value()}
 
-        with open("..\settings\default.json", "w") as file:
+        print("trying to open file")
+        path = os.path.dirname(__file__)
+        print(os.path.dirname(__file__))
+        path = os.path.join(path, "..", "settings", self.filename)
+        print(path)
+        path = os.path.abspath(path)
+        print(path)
+        with open(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "settings", self.filename)), "w") as file:
             s = json.dumps(settings, indent=4)
             file.write(s)
 
+    # TODO: fix filepath
     def import_settings(self):
-        with open("..\settings\default.json", "r") as file:
+        print("loading settings")
+        with open(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "settings", self.filename)), "r") as file:
             s = "".join(file.readlines())
             settings = json.loads(s)
-
+        print("1")
         for i in range(len(settings["channels"])):
             channel_form = self.channel_forms[i]
             channel_settings = settings["channels"][i]
@@ -352,6 +368,7 @@ class Gui(qtw.QWidget):
             channel_form["shunted"].setChecked(channel_settings["shunted"])
             channel_form["units"].setCurrentIndex(channel_settings["units"])
             channel_form["resistance_range"].setCurrentIndex(channel_settings["resistance_range"])
+            print("2")
             for j in range(len(channel_settings["readings"])):
                 reading_settings = channel_settings["readings"][j]
                 reading_form = channel_form["readings"][j]
@@ -374,7 +391,7 @@ class Gui(qtw.QWidget):
 
 def show_gui(controller=None):
     app = qtw.QApplication(sys.argv)
-    gui = Gui(controller)
+    gui = SettingsGui(controller)
     app.exec_()
 
 

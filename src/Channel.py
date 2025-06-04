@@ -5,13 +5,14 @@ import InputData
 
 class Channel:
 
+    # TODO: maybe use Device class to get device instead of parameter
+    # TODO: specialfunctionality attribute (for heating stuff)
     def __init__(self, device: Model372, input_channel: Model372.InputChannel):
         self.device = device
         self.input_channel = input_channel
         self.wanted_reading_keys = []
         self.wanted_reading_names = []
         self.wanted_plotting_names = []
-        # self.configure_setup_settings()
         # self.set_filter()
 
     # returns readings of {kelvin, resistance, power} as dictionary
@@ -22,14 +23,8 @@ class Channel:
     def configure_setup_settings(self, settings: Model372InputSetupSettings = None):
         if settings:
             self.device.configure_input(self.input_channel.value, settings)
-        else:
-            self.device.configure_input(self.input_channel.value, self.create_input_setup_settings())
 
-    # creates this channels input setup settings from values set in InputData.py
-    # @abstract
-    def create_input_setup_settings(self) -> Model372InputSetupSettings:
-        raise NotImplementedError("Implement this method in subclass")
-
+    # TODO: make this use settings selected in gui
     # sets the measurement filter for this channel
     def set_filter(self):
         self.device.set_filter(input_channel=self.input_channel.value,

@@ -7,7 +7,7 @@ from src.Heater import Heater
 from src.Thermometer import Thermometer
 from src.Channel import Channel, ChannelSettings
 from MPVWrapper import MPVWrapper, MPVSettings
-import src.Gui as Gui
+import src.SettingsGui as Gui
 
 
 class Controller:
