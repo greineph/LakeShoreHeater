@@ -306,7 +306,6 @@ class SettingsGui(qtw.QWidget):
         self.controller.ready = True
         self.close()
 
-    # TODO: fix filepath
     def save_settings(self):
         settings = {"channels": [],
                     "mpv": None,
@@ -351,7 +350,6 @@ class SettingsGui(qtw.QWidget):
             s = json.dumps(settings, indent=4)
             file.write(s)
 
-    # TODO: fix filepath
     def import_settings(self):
         print("loading settings")
         with open(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "settings", self.filename)), "r") as file:

@@ -22,7 +22,7 @@ class LiveGraph:
         style.use("seaborn-v0_8-whitegrid")
         self.fig = plt.figure()
         ax = self.fig.add_subplot(111)
-        plt.ylim(0, 400)
+        plt.ylim(-10, 500)
         plt.xlim(0, 10)
         plt.ion()
         for y in self.y_axis:

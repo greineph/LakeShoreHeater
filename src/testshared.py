@@ -58,7 +58,7 @@ class Reader(threading.Thread):
             self.last = min(90.0, max(0.0, self.last + random.uniform(-2, 2)))
             self.graph.new_data(self.last)
             # print("hi Im a thread")
-            time.sleep(0.001)
+            # time.sleep(0.001)
 
 
 def update():
@@ -100,7 +100,7 @@ if __name__ == "__main__":
 
     while True:
         g.update(1)
-        time.sleep(0.1)
+        time.sleep(0.01)
 
 
 

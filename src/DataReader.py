@@ -19,6 +19,7 @@ class DataReader(threading.Thread):
 
     def run(self):
         start_timestamp = datetime.now()
+        start_time = time.monotonic()
 
         self.is_running = True
         while self.is_running:
@@ -28,7 +29,7 @@ class DataReader(threading.Thread):
             if self.mpv_wrapper:
                 row += self.mpv_wrapper.get_wanted_readings()
             self.notify_subscribers(data=row)
-            time.sleep(self.logging_interval)
+            time.sleep(self.logging_interval - ((time.monotonic() - start_time) % self.logging_interval))
 
     # Observer-pattern:
     def add_subscriber(self, subscriber):
