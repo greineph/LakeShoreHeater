@@ -35,7 +35,7 @@ class SettingsGui(qtw.QWidget):
 
         self.filename = "default.json"
 
-        # self.setGeometry(100, 100, 600, 400)
+        self.setGeometry(100, 100, 0, 0)
         self.setWindowTitle("Setup")
 
         self.setLayout(qtw.QVBoxLayout())
@@ -134,6 +134,7 @@ class SettingsGui(qtw.QWidget):
         channel.setCurrentIndex(index)
         form_layout.addRow(channel)
         channel_form["channel"] = channel
+        channel_form["prev_channel"] = channel.currentIndex()
 
         # TODO: Temperature calibration (steal from lakeshoredatalogger)
         calibration = qtw.QComboBox(parent)
@@ -196,22 +197,25 @@ class SettingsGui(qtw.QWidget):
 
         # TODO: possibly change selectable ranges if channel is Control or not
         def on_channel_changed(value=0):
-            quadrature_boxes = channel_form["readings"][3]
-            if value == 0 and quadrature_boxes["log"].isEnabled():
-                quadrature_boxes["log"].setEnabled(False)
-                quadrature_boxes["plot"].setEnabled(False)
-                quadrature_boxes["custom_name"].setEnabled(False)
+            quad_boxes = channel_form["readings"][3]
+            print(f"old: {channel_form['prev_channel']}, new: {value}")
+            if value == 0 and channel_form["prev_channel"] != 0:
+                quad_boxes["log"].setEnabled(False)
+                quad_boxes["plot"].setEnabled(False)
+                quad_boxes["custom_name"].setEnabled(False)
                 if excitation_mode.currentIndex() == 0:
                     on_excitation_mode_changed()
                 else:
                     excitation_mode.setCurrentIndex(0)
                 excitation_mode.setDisabled(True)
-            elif value != 0 and not quadrature_boxes["log"].isEnabled():
-                quadrature_boxes["log"].setEnabled(True)
-                quadrature_boxes["plot"].setEnabled(True)
-                quadrature_boxes["custom_name"].setEnabled(True)
+            elif value != 0 and channel_form["prev_channel"] == 0:
+                quad_boxes["log"].setEnabled(True)
+                quad_boxes["plot"].setEnabled(True)
+                quad_boxes["custom_name"].setEnabled(True)
                 excitation_mode.setDisabled(False)
                 on_excitation_mode_changed()
+
+            channel_form["prev_channel"] = value
 
         channel.currentIndexChanged.connect(on_channel_changed)
 
@@ -312,8 +316,8 @@ class SettingsGui(qtw.QWidget):
 
         default_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "data", "default.csv"))
         print(default_path)
-        save_path = qtw.QFileDialog.getSaveFileName(self, "Save", default_path)
-        print(save_path[0])
+        save_path = qtw.QFileDialog.getSaveFileName(self, "Save", default_path)[0]
+        print(save_path)
         self.controller.save_path = save_path
 
         # self.close()
@@ -359,6 +363,13 @@ class SettingsGui(qtw.QWidget):
         self.close()
 
     def save_settings(self):
+        default_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "settings", "default.json"))
+        print(default_path)
+        save_path = qtw.QFileDialog.getSaveFileName(self, "Save", default_path)[0]
+        print(save_path)
+        if len(save_path) == 0:
+            return
+
         settings = {"channels": [],
                     "mpv": None,
                     "logging": None}
@@ -392,25 +403,22 @@ class SettingsGui(qtw.QWidget):
 
         settings["logging"] = {"interval": self.logging_form["interval"].value()}
 
-        print("trying to open file")
-        path = os.path.dirname(__file__)
-        print(os.path.dirname(__file__))
-        path = os.path.join(path, "..", "settings", self.filename)
-        print(path)
-        path = os.path.abspath(path)
-        print(path)
-        with open(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "settings", self.filename)),
-                  "w") as file:
+        with open(save_path, "w") as file:
             s = json.dumps(settings, indent=4)
             file.write(s)
 
     def import_settings(self):
         print("loading settings")
-        with open(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "settings", self.filename)),
-                  "r") as file:
+        default_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "settings", "default.json"))
+        print(default_path)
+        save_path = qtw.QFileDialog.getOpenFileName(self, "Save", default_path)[0]
+        print(save_path)
+        if len(save_path) == 0:
+            return
+
+        with open(save_path, "r") as file:
             s = "".join(file.readlines())
             settings = json.loads(s)
-        print("1")
         for i in range(len(settings["channels"])):
             channel_form = self.channel_forms[i]
             channel_settings = settings["channels"][i]
@@ -422,7 +430,6 @@ class SettingsGui(qtw.QWidget):
             channel_form["shunted"].setChecked(channel_settings["shunted"])
             channel_form["units"].setCurrentIndex(channel_settings["units"])
             channel_form["resistance_range"].setCurrentIndex(channel_settings["resistance_range"])
-            print("2")
             for j in range(len(channel_settings["readings"])):
                 reading_settings = channel_settings["readings"][j]
                 reading_form = channel_form["readings"][j]
