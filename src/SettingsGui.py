@@ -12,16 +12,12 @@ from PyQt5.QtWidgets import QSizePolicy
 from InputData import range_text_converter
 from Channel import ChannelSettings
 from MPVWrapper import MPVSettings
+from src import TemperatureCalibration
 
 from UliEngineering.Electronics.Resistors import resistor_tolerance
 from lakeshore import Model372
 
-from src import TemperatureCalibration
 
-
-# TODO: gui has to be in a thread because matplotlib has to be in the mainthread :>
-#   maybe make gui main thread and put graph/ datahub in process or this in process idk
-#   or if possible implement matplot graph into ui so everything works ._.
 class SettingsGui(qtw.QWidget):
 
     def __init__(self, controller=None):
@@ -40,10 +36,12 @@ class SettingsGui(qtw.QWidget):
 
         self.setLayout(qtw.QVBoxLayout())
 
-        self.setFont(qtg.QFont("Helvetica", 16))
+        self.setFont(qtg.QFont("Bahnschrift", 16))
+        self.setStyleSheet(" QToolTip{ font: 16pt }")
+        self.setToolTipDuration(0)
 
         label = qtw.QLabel("Settings")
-        title_font = qtg.QFont("Helvetica", 30)
+        title_font = qtg.QFont("Bahnschrift", 30)
         title_font.setBold(True)
         label.setFont(title_font)
         label.setAlignment(Qt.AlignCenter)
@@ -136,7 +134,6 @@ class SettingsGui(qtw.QWidget):
         channel_form["channel"] = channel
         channel_form["prev_channel"] = channel.currentIndex()
 
-        # TODO: Temperature calibration (steal from lakeshoredatalogger)
         calibration = qtw.QComboBox(parent)
         for key in TemperatureCalibration.functions.keys():
             calibration.addItem(key, key)

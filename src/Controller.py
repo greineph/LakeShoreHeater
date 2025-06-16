@@ -12,6 +12,7 @@ import src.SettingsGui as Gui
 
 class Controller:
 
+    # TODO: error handling
     def __init__(self):
         self.channels = []
         self.mpv_wrapper = None

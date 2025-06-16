@@ -60,7 +60,7 @@ class Datahub:
     def update(self, data):
         self.df.loc[len(self.df)] = data
         with open(self.save_path, "a") as file:
-            file.write(",".join(data) + "\n")
+            file.write(",".join([str(i) for i in data]) + "\n")
         print(data)
 
     # creates a csv file from the current data in self.df to {path} as {name}

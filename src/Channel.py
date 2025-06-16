@@ -43,7 +43,9 @@ class Channel:
     def get_wanted_readings(self) -> list:
         readings = self.get_readings()
         if "resistance" in self.wanted_reading_keys:
+            print(f"original value: {readings['resistance']}")
             readings["resistance"] = TemperatureCalibration.functions[self.calibration](readings["resistance"])
+            print(f"using {self.calibration}: {readings['resistance']}")
         return [readings[key] for key in self.wanted_reading_keys]
 
     def get_input_channel(self):

@@ -48,8 +48,8 @@ WANTED_READINGS_THERMOMETER = ["kelvin", "resistance", "power"]
 MPV_ENABLED = True
 # list of wanted readings ["field", "temperature"] for mpv client
 WANTED_READINGS_MPV = ["field", "temperature"]
-# TODO: do more settings
 
+# TODO: 1 for all channels (low priority)
 # Settings for filter
 # turn filter on/off (True, False)
 STATE_FILTER = True
