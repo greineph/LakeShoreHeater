@@ -6,12 +6,17 @@ from PyQt5 import QtWidgets as qtw
 from PyQt5 import QtGui as qtg
 from PyQt5.QtCore import Qt
 import sys
+
+from PyQt5.QtWidgets import QSizePolicy
+
 from InputData import range_text_converter
 from Channel import ChannelSettings
 from MPVWrapper import MPVSettings
 
 from UliEngineering.Electronics.Resistors import resistor_tolerance
 from lakeshore import Model372
+
+from src import TemperatureCalibration
 
 
 # TODO: gui has to be in a thread because matplotlib has to be in the mainthread :>
@@ -131,17 +136,27 @@ class SettingsGui(qtw.QWidget):
         channel_form["channel"] = channel
 
         # TODO: Temperature calibration (steal from lakeshoredatalogger)
+        calibration = qtw.QComboBox(parent)
+        for key in TemperatureCalibration.functions.keys():
+            calibration.addItem(key, key)
+        form_layout.addRow(calibration)
+        channel_form["calibration"] = calibration
 
-        # TODO: change range depending on mode
         excitation_mode = qtw.QComboBox(parent)
         excitation_mode.addItem("current", Model372.SensorExcitationMode.CURRENT)
         excitation_mode.addItem("voltage", Model372.SensorExcitationMode.VOLTAGE)
+        if channel.currentIndex() == 0:
+            excitation_mode.setDisabled(True)
         form_layout.addRow("Excitation Mode:", excitation_mode)
         channel_form["excitation_mode"] = excitation_mode
 
         excitation_range = qtw.QComboBox(parent)
-        for x in Model372.MeasurementInputCurrentRange:
-            excitation_range.addItem(range_text_converter(x.name), x)
+        if channel.currentIndex() == 0:
+            for x in Model372.ControlInputCurrentRange:
+                excitation_range.addItem(range_text_converter(x.name), x)
+        else:
+            for x in Model372.MeasurementInputCurrentRange:
+                excitation_range.addItem(range_text_converter(x.name), x)
         form_layout.addRow("Excitation Range:", excitation_range)
         channel_form["excitation_range"] = excitation_range
 
@@ -186,12 +201,35 @@ class SettingsGui(qtw.QWidget):
                 quadrature_boxes["log"].setEnabled(False)
                 quadrature_boxes["plot"].setEnabled(False)
                 quadrature_boxes["custom_name"].setEnabled(False)
+                if excitation_mode.currentIndex() == 0:
+                    on_excitation_mode_changed()
+                else:
+                    excitation_mode.setCurrentIndex(0)
+                excitation_mode.setDisabled(True)
             elif value != 0 and not quadrature_boxes["log"].isEnabled():
                 quadrature_boxes["log"].setEnabled(True)
                 quadrature_boxes["plot"].setEnabled(True)
                 quadrature_boxes["custom_name"].setEnabled(True)
+                excitation_mode.setDisabled(False)
+                on_excitation_mode_changed()
 
         channel.currentIndexChanged.connect(on_channel_changed)
+
+        def on_excitation_mode_changed(value=0):
+            excitation_range.clear()
+            print("changed ex mode")
+            if value == 0:  # current
+                if channel.currentIndex() == 0:
+                    for x in Model372.ControlInputCurrentRange:
+                        excitation_range.addItem(range_text_converter(x.name), x)
+                else:
+                    for x in Model372.MeasurementInputCurrentRange:
+                        excitation_range.addItem(range_text_converter(x.name), x)
+            else:           # voltage
+                for x in Model372.MeasurementInputVoltageRange:
+                    excitation_range.addItem(range_text_converter(x.name), x)
+
+        excitation_mode.currentIndexChanged.connect(on_excitation_mode_changed)
 
     def load_wanted_readings_checkboxes(self, form_layout: qtw.QFormLayout, readings: list[str]) -> list[dict]:
         form_layout.addRow(qtw.QLabel("Select Wanted Readings:"))
@@ -263,10 +301,23 @@ class SettingsGui(qtw.QWidget):
         form_layout.addRow("interval:", interval)
         logging_form["interval"] = interval
 
+        # directory = qtw.QLabel(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "data", "default.csv")))
+        # form_layout.addRow(directory)
+        # logging_form["directory"] = directory
+
         self.logging_form = logging_form
 
     def submit_forms(self):
         print("submitting")
+
+        default_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "data", "default.csv"))
+        print(default_path)
+        save_path = qtw.QFileDialog.getSaveFileName(self, "Save", default_path)
+        print(save_path[0])
+        self.controller.save_path = save_path
+
+        # self.close()
+
         for channel_form in self.channel_forms:
             readings = []
             for reading in channel_form["readings"]:
@@ -278,6 +329,7 @@ class SettingsGui(qtw.QWidget):
                                      "custom_name": custom_name})
 
             channel_settings = ChannelSettings(channel=channel_form["channel"].currentData(),
+                                               calibration=channel_form["calibration"].currentData(),
                                                excitation_mode=channel_form["excitation_mode"].currentData(),
                                                excitation_range=channel_form["excitation_range"].currentData(),
                                                auto_range=channel_form["auto_range"].currentData(),
@@ -320,6 +372,7 @@ class SettingsGui(qtw.QWidget):
                                  "custom_name": reading["custom_name"].text()})
 
             settings["channels"].append({"channel": channel_form["channel"].currentIndex(),
+                                         "calibration": channel_form["calibration"].currentIndex(),
                                          "excitation_mode": channel_form["excitation_mode"].currentIndex(),
                                          "excitation_range": channel_form["excitation_range"].currentIndex(),
                                          "auto_range": channel_form["auto_range"].currentIndex(),
@@ -346,13 +399,15 @@ class SettingsGui(qtw.QWidget):
         print(path)
         path = os.path.abspath(path)
         print(path)
-        with open(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "settings", self.filename)), "w") as file:
+        with open(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "settings", self.filename)),
+                  "w") as file:
             s = json.dumps(settings, indent=4)
             file.write(s)
 
     def import_settings(self):
         print("loading settings")
-        with open(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "settings", self.filename)), "r") as file:
+        with open(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "settings", self.filename)),
+                  "r") as file:
             s = "".join(file.readlines())
             settings = json.loads(s)
         print("1")
@@ -360,6 +415,7 @@ class SettingsGui(qtw.QWidget):
             channel_form = self.channel_forms[i]
             channel_settings = settings["channels"][i]
             channel_form["channel"].setCurrentIndex(channel_settings["channel"])
+            channel_form["calibration"].setCurrentIndex(channel_settings["calibration"])
             channel_form["excitation_mode"].setCurrentIndex(channel_settings["excitation_mode"])
             channel_form["excitation_range"].setCurrentIndex(channel_settings["excitation_range"])
             channel_form["auto_range"].setCurrentIndex(channel_settings["auto_range"])
@@ -384,7 +440,6 @@ class SettingsGui(qtw.QWidget):
             reading_form["custom_name"].setText(reading_settings["custom_name"])
 
         self.logging_form["interval"].setValue(settings["logging"]["interval"])
-
 
 
 def show_gui(controller=None):

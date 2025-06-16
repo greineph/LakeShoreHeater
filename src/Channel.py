@@ -1,6 +1,7 @@
 from Device import Device
 from lakeshore import Model372, Model372InputSetupSettings
 import InputData
+import TemperatureCalibration
 
 
 class Channel:
@@ -13,6 +14,7 @@ class Channel:
         self.wanted_reading_keys = []
         self.wanted_reading_names = []
         self.wanted_plotting_names = []
+        self.calibration = "None"
         # self.set_filter()
 
     # returns readings of {kelvin, resistance, power} as dictionary
@@ -40,6 +42,8 @@ class Channel:
 
     def get_wanted_readings(self) -> list:
         readings = self.get_readings()
+        if "resistance" in self.wanted_reading_keys:
+            readings["resistance"] = TemperatureCalibration.functions[self.calibration](readings["resistance"])
         return [readings[key] for key in self.wanted_reading_keys]
 
     def get_input_channel(self):
@@ -49,9 +53,10 @@ class Channel:
 # holds and processes all the relevant data defined in the settings menu
 class ChannelSettings:
 
-    def __init__(self, channel, excitation_mode, excitation_range, auto_range, shunted, units, resistance_range,
-                 readings):
+    def __init__(self, channel, calibration, excitation_mode, excitation_range, auto_range, shunted, units,
+                 resistance_range, readings):
         self.channel = channel
+        self.calibration = calibration
         self.excitation_mode = excitation_mode
         self.excitation_range = excitation_range
         self.auto_range = auto_range
@@ -74,6 +79,7 @@ class ChannelSettings:
         channel.wanted_reading_keys = [reading["reading"] for reading in self.readings]
         channel.wanted_reading_names = [reading["custom_name"] for reading in self.readings]
         channel.wanted_plotting_names = [reading["custom_name"] for reading in self.readings if reading["plot"]]
+        channel.calibration = self.calibration
         return channel
 
     def __str__(self):

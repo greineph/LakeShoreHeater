@@ -75,5 +75,6 @@ def range_text_converter(text: str):
     text = text.replace("AMPS", "A")
     text = text.replace("AMP", "A")
     text = text.replace("OHMS", "O")
-    text = text.replace("_", "\t")
+    text = text.replace("VOLTS", "V")
+    text = text.replace("_", " ")
     return text

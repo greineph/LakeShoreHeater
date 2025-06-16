@@ -1,3 +1,4 @@
+import os
 import time
 from datetime import datetime
 
@@ -12,9 +13,13 @@ from MPVWrapper import MPVWrapper
 
 class Datahub:
 
-    def __init__(self, channels: list[Channel], mpv_wrapper: MPVWrapper = None):
+    def __init__(self, channels: list[Channel], mpv_wrapper: MPVWrapper = None, save_path=""):
         self.channels = channels
         self.mpv_wrapper = mpv_wrapper
+        if len(save_path) > 0:
+            self.save_path = save_path
+        else:
+            self.save_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "data", "default.csv"))
 
         columns = ["timestamp", "timedelta"]
         for ch in self.channels:
@@ -42,6 +47,7 @@ class Datahub:
         self.graph = LiveGraph(datahub=self,
                                x_axis="timedelta",
                                y_axis=plotting_names)
+        self.write_csv(self.save_path)
 
         self.reader.start()
         self.graph.initialize()
@@ -53,11 +59,13 @@ class Datahub:
     # appends {data} to self.df
     def update(self, data):
         self.df.loc[len(self.df)] = data
+        with open(self.save_path, "a") as file:
+            file.write(",".join(data) + "\n")
         print(data)
 
     # creates a csv file from the current data in self.df to {path} as {name}
-    def write_csv(self, name:  str = "out", path: str = "./data"):
-        self.df.to_csv(f"{path}/{name}.csv", encoding="utf-8", index=False)
+    def write_csv(self, path: str = "./data/out.csv"):
+        self.df.to_csv(path, encoding="utf-8", index=False)
 
     def get_data(self) -> pd.DataFrame:
         return self.df

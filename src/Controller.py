@@ -17,13 +17,9 @@ class Controller:
         self.mpv_wrapper = None
         self.ready = False
         self.logging_interval = 5
-        print(self)
+        self.save_path = ""
         Gui.show_gui(self)
-        # self.heater = Heater(Device.get_device(), InputData.CHANNEL_HEATER)
-        # self.thermometer = Thermometer(Device.get_device(), InputData.CHANNEL_THERMOMETER)
-        # if InputData.MPV_ENABLED:
-        #     self.mpv_wrapper = MPVWrapper()
-        self.datahub = Datahub(channels=self.channels, mpv_wrapper=self.mpv_wrapper)
+        self.datahub = Datahub(channels=self.channels, mpv_wrapper=self.mpv_wrapper, save_path=self.save_path)
 
     # starts the process
     # TODO: set_scanner_status to relevant channel
