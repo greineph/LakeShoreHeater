@@ -31,10 +31,11 @@ class SettingsGui(qtw.QWidget):
 
         self.filename = "default.json"
 
-        self.setGeometry(100, 100, 0, 0)
+        self.setGeometry(100, 100, 1000, 800)
         self.setWindowTitle("Setup")
 
         self.setLayout(qtw.QVBoxLayout())
+        self.layout().setContentsMargins(0, 0, 0, 0)
 
         self.setFont(qtg.QFont("Bahnschrift", 16))
         self.setStyleSheet(" QToolTip{ font: 16pt }")
@@ -66,6 +67,12 @@ class SettingsGui(qtw.QWidget):
         form_holder4 = qtw.QWidget()
         form_holder_holder.layout().addWidget(form_holder4)
         self.load_logging_settings_form(form_holder4)
+
+        scroll = qtw.QScrollArea()
+        scroll.setWidget(form_holder_holder)
+        scroll.setMinimumSize(500, 300)
+        scroll.setFrameShape(qtw.QFrame.Shape.NoFrame)
+        self.layout().addWidget(scroll)
 
         submit_btn = qtw.QPushButton("Submit")
         submit_btn.clicked.connect(self.submit_forms)

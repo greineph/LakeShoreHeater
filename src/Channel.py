@@ -26,6 +26,10 @@ class Channel:
         if settings:
             self.device.configure_input(self.input_channel.value, settings)
 
+    # returns channels setup settings from lakeshore device
+    def get_setup_settings(self) -> Model372InputSetupSettings:
+        return self.device.get_input_setup_parameters(self.input_channel.value)
+
     # TODO: make this use settings selected in gui
     # sets the measurement filter for this channel
     def set_filter(self):

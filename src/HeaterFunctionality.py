@@ -3,23 +3,29 @@ import numpy as np
 
 class HeaterFunctionality:
 
-    def __init__(self):
-        self.channel = None
+    def __init__(self, channel, use_threshold, activation_threshold, deactivation_threshold, threshold_delta,
+                 use_stability, number_of_values, standard_deviation, max_threshold, active_excitation,
+                 inactive_excitation):
+        self.channel = channel
         self.heater_active = False
 
-        self.use_threshold = False
-        self.current_value = 0
-        self.activation_threshold = 1
-        self.deactivation_threshold = 10
-        self.threshold_delta = 0.5
+        self.use_threshold = use_threshold
+        self.current_value = 9999.9
+        self.activation_threshold = activation_threshold
+        self.deactivation_threshold = deactivation_threshold
+        self.threshold_delta = threshold_delta
 
-        self.use_stability = False
-        self.number_of_values = 10
+        self.use_stability = use_stability
+        self.number_of_values = number_of_values
         self.recent_values = []
-        self.standard_deviation = 2
-        self.max_threshold = 50
+        self.standard_deviation = standard_deviation
+        self.max_threshold = max_threshold
 
-    def check(self):
+        self.active_excitation = active_excitation
+        self.inactive_excitation = inactive_excitation
+
+    # activates/deactivates the heater based on criteria set during initialisation
+    def update(self):
         if self.use_threshold:
             if self.current_value < self.activation_threshold + self.threshold_delta:
                 self.activate_heater()
@@ -33,20 +39,29 @@ class HeaterFunctionality:
             elif std > self.standard_deviation:
                 self.deactivate_heater()
 
+    # add a new value to be used in update
     def add_value(self, value):
         self.recent_values.append(value)
         if len(self.recent_values) > self.number_of_values:
             self.recent_values.remove(self.recent_values[0])
 
+    # activates the heater of associated channel by changing excitation range
     def activate_heater(self):
         if self.heater_active:
             return
 
+        settings = self.channel.get_setup_settings()
+        settings.excitation_range = self.active_excitation
+        self.channel.configure_setup_settings(settings)
         self.heater_active = True
 
+    # deactivates the heater of associated channel by changing excitation range
     def deactivate_heater(self):
         if not self.heater_active:
             return
 
+        settings = self.channel.get_setup_settings()
+        settings.excitation_range = self.inactive_excitation
+        self.channel.configure_setup_settings(settings)
         self.heater_active = False
 
