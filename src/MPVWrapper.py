@@ -18,7 +18,6 @@ class MPVWrapper:
         self.server.open()
         self.client.open()
 
-    # TODO: maybe dont open/close client every time, disable logs of mpv somehow
     def get_wanted_readings(self) -> list:
         readings = []
         for key in self.get_wanted_reading_keys():

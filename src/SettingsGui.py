@@ -197,9 +197,61 @@ class SettingsGui(qtw.QWidget):
             quadrature_boxes["plot"].setEnabled(False)
             quadrature_boxes["custom_name"].setEnabled(False)
 
+        # TODO: could handle functionality gui generation in its class for easy extendability
+        functionality = qtw.QComboBox(parent)
+        functionality.addItem("Basic", 0)
+        functionality.addItem("Heater", 1)
+        form_layout.addRow(functionality)
+        channel_form["functionality"] = functionality
+
+        use_threshold = qtw.QCheckBox(parent)
+        use_threshold.setChecked(True)
+        form_layout.addRow("Threshold:", use_threshold)
+
+        activation_threshold = qtw.QDoubleSpinBox()
+        activation_threshold.setRange(0, 10000)
+        activation_threshold.setValue(1)
+        activation_threshold.setSuffix("B")
+        activation_threshold.setButtonSymbols(qtw.QAbstractSpinBox.ButtonSymbols.NoButtons)
+        activation_threshold.setAlignment(Qt.AlignRight)
+        form_layout.addRow("Activates at:", activation_threshold)
+
+        deactivation_threshold = qtw.QDoubleSpinBox()
+        deactivation_threshold.setRange(0, 10000)
+        deactivation_threshold.setValue(100)
+        deactivation_threshold.setSuffix("B")
+        deactivation_threshold.setButtonSymbols(qtw.QAbstractSpinBox.ButtonSymbols.NoButtons)
+        deactivation_threshold.setAlignment(Qt.AlignRight)
+        form_layout.addRow("Deactivates at:", deactivation_threshold)
+
+        threshold_delta = qtw.QDoubleSpinBox()
+        threshold_delta.setRange(0, 100)
+        threshold_delta.setValue(2)
+        threshold_delta.setSuffix("B")
+        threshold_delta.setButtonSymbols(qtw.QAbstractSpinBox.ButtonSymbols.NoButtons)
+        threshold_delta.setAlignment(Qt.AlignRight)
+        form_layout.addRow("Delta:", threshold_delta)
+
+        use_stability = qtw.QCheckBox(parent)
+        use_stability.setChecked(True)
+        form_layout.addRow("Stability:", use_stability)
+
+        number_of_values = qtw.QSpinBox()
+        number_of_values.setRange(0, 100)
+        number_of_values.setValue(5)
+        number_of_values.setButtonSymbols(qtw.QAbstractSpinBox.ButtonSymbols.NoButtons)
+        number_of_values.setAlignment(Qt.AlignRight)
+        form_layout.addRow("Number of Values:", number_of_values)
+
+        deviation = qtw.QDoubleSpinBox()
+        deviation.setRange(0, 100)
+        deviation.setValue(3)
+        deviation.setButtonSymbols(qtw.QAbstractSpinBox.ButtonSymbols.NoButtons)
+        deviation.setAlignment(Qt.AlignRight)
+        form_layout.addRow("Deviation:", deviation)
+
         self.channel_forms.append(channel_form)
 
-        # TODO: possibly change selectable ranges if channel is Control or not
         def on_channel_changed(value=0):
             quad_boxes = channel_form["readings"][3]
             print(f"old: {channel_form['prev_channel']}, new: {value}")
@@ -302,11 +354,12 @@ class SettingsGui(qtw.QWidget):
         logging_form = {}
 
         interval = qtw.QDoubleSpinBox()
-        interval.setValue(2)
         interval.setRange(1, 100)
-        interval.setSingleStep(1)
+        interval.setValue(2)
         interval.setSuffix("s")
-        form_layout.addRow("interval:", interval)
+        interval.setButtonSymbols(qtw.QAbstractSpinBox.ButtonSymbols.NoButtons)
+        interval.setAlignment(Qt.AlignRight)
+        form_layout.addRow("Interval:", interval)
         logging_form["interval"] = interval
 
         # directory = qtw.QLabel(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "data", "default.csv")))
