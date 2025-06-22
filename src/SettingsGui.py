@@ -5,17 +5,19 @@ import json
 from PyQt5 import QtWidgets as qtw
 from PyQt5 import QtGui as qtg
 from PyQt5.QtCore import Qt
-import sys
-
 from PyQt5.QtWidgets import QSizePolicy
+import sys
 
 from InputData import range_text_converter
 from Channel import ChannelSettings
 from MPVWrapper import MPVSettings
 from src import TemperatureCalibration
+import FunctionalityFunctions
 
 from UliEngineering.Electronics.Resistors import resistor_tolerance
 from lakeshore import Model372
+
+from src.AbstractFunctionality import AbstractFunctionality
 
 
 class SettingsGui(qtw.QWidget):
@@ -129,6 +131,7 @@ class SettingsGui(qtw.QWidget):
         form_layout.addRow(title)
 
         channel_form = {}
+        self.channel_forms.append(channel_form)
 
         channel = qtw.QComboBox(parent)
         channel.addItem("Channel A", Model372.InputChannel.CONTROL)
@@ -199,58 +202,11 @@ class SettingsGui(qtw.QWidget):
 
         # TODO: could handle functionality gui generation in its class for easy extendability
         functionality = qtw.QComboBox(parent)
-        functionality.addItem("Basic", 0)
-        functionality.addItem("Heater", 1)
+        functionality.addItem("Basic", "Basic")
+        functionality.addItem("Heater", "Heater")
         form_layout.addRow(functionality)
         channel_form["functionality"] = functionality
-
-        use_threshold = qtw.QCheckBox(parent)
-        use_threshold.setChecked(True)
-        form_layout.addRow("Threshold:", use_threshold)
-
-        activation_threshold = qtw.QDoubleSpinBox()
-        activation_threshold.setRange(0, 10000)
-        activation_threshold.setValue(1)
-        activation_threshold.setSuffix("B")
-        activation_threshold.setButtonSymbols(qtw.QAbstractSpinBox.ButtonSymbols.NoButtons)
-        activation_threshold.setAlignment(Qt.AlignRight)
-        form_layout.addRow("Activates at:", activation_threshold)
-
-        deactivation_threshold = qtw.QDoubleSpinBox()
-        deactivation_threshold.setRange(0, 10000)
-        deactivation_threshold.setValue(100)
-        deactivation_threshold.setSuffix("B")
-        deactivation_threshold.setButtonSymbols(qtw.QAbstractSpinBox.ButtonSymbols.NoButtons)
-        deactivation_threshold.setAlignment(Qt.AlignRight)
-        form_layout.addRow("Deactivates at:", deactivation_threshold)
-
-        threshold_delta = qtw.QDoubleSpinBox()
-        threshold_delta.setRange(0, 100)
-        threshold_delta.setValue(2)
-        threshold_delta.setSuffix("B")
-        threshold_delta.setButtonSymbols(qtw.QAbstractSpinBox.ButtonSymbols.NoButtons)
-        threshold_delta.setAlignment(Qt.AlignRight)
-        form_layout.addRow("Delta:", threshold_delta)
-
-        use_stability = qtw.QCheckBox(parent)
-        use_stability.setChecked(True)
-        form_layout.addRow("Stability:", use_stability)
-
-        number_of_values = qtw.QSpinBox()
-        number_of_values.setRange(0, 100)
-        number_of_values.setValue(5)
-        number_of_values.setButtonSymbols(qtw.QAbstractSpinBox.ButtonSymbols.NoButtons)
-        number_of_values.setAlignment(Qt.AlignRight)
-        form_layout.addRow("Number of Values:", number_of_values)
-
-        deviation = qtw.QDoubleSpinBox()
-        deviation.setRange(0, 100)
-        deviation.setValue(3)
-        deviation.setButtonSymbols(qtw.QAbstractSpinBox.ButtonSymbols.NoButtons)
-        deviation.setAlignment(Qt.AlignRight)
-        form_layout.addRow("Deviation:", deviation)
-
-        self.channel_forms.append(channel_form)
+        channel_form["functionality_form"] = {}
 
         def on_channel_changed(value=0):
             quad_boxes = channel_form["readings"][3]
@@ -290,6 +246,20 @@ class SettingsGui(qtw.QWidget):
                     excitation_range.addItem(range_text_converter(x.name), x)
 
         excitation_mode.currentIndexChanged.connect(on_excitation_mode_changed)
+
+        def on_functionality_changed():
+            print("try change func")
+            print(channel_form["functionality_form"])
+            for item in channel_form["functionality_form"].items():
+                form_layout.labelForField(item[1]).deleteLater()
+                item[1].deleteLater()
+            print("all destroyed")
+            print(FunctionalityFunctions.functions[functionality.currentData()])
+            channel_form["functionality_form"] = (
+                FunctionalityFunctions.functions[functionality.currentData()]["load"](parent))
+            print(channel_form["functionality_form"])
+
+        functionality.currentIndexChanged.connect(on_functionality_changed)
 
     def load_wanted_readings_checkboxes(self, form_layout: qtw.QFormLayout, readings: list[str]) -> list[dict]:
         form_layout.addRow(qtw.QLabel("Select Wanted Readings:"))
