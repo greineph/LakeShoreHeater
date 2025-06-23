@@ -206,7 +206,15 @@ class SettingsGui(qtw.QWidget):
         functionality.addItem("Heater", "Heater")
         form_layout.addRow(functionality)
         channel_form["functionality"] = functionality
-        channel_form["functionality_form"] = {}
+
+        channel_form["functionality_form"] = {"old_value": functionality.currentData()}
+        for key in FunctionalityFunctions.functions:
+            print("load gui elemnesnfse")
+            channel_form["functionality_form"][key] = FunctionalityFunctions.functions[key]["load"](parent)
+            for item in channel_form["functionality_form"][key].items():
+                item[1].setVisible(False)
+                form_layout.labelForField(item[1]).setVisible(False)
+
 
         def on_channel_changed(value=0):
             quad_boxes = channel_form["readings"][3]
@@ -250,14 +258,20 @@ class SettingsGui(qtw.QWidget):
         def on_functionality_changed():
             print("try change func")
             print(channel_form["functionality_form"])
-            for item in channel_form["functionality_form"].items():
-                form_layout.labelForField(item[1]).deleteLater()
-                item[1].deleteLater()
+            func_form = channel_form["functionality_form"]
+            old_form = func_form[func_form["old_value"]]
+            new_form = func_form[channel_form["functionality"].currentData()]
+
+            for item in old_form.items():
+                form_layout.labelForField(item[1]).setVisible(False)
+                item[1].setVisible(False)
             print("all destroyed")
-            print(FunctionalityFunctions.functions[functionality.currentData()])
-            channel_form["functionality_form"] = (
-                FunctionalityFunctions.functions[functionality.currentData()]["load"](parent))
-            print(channel_form["functionality_form"])
+            for item in new_form.items():
+                form_layout.labelForField(item[1]).setVisible(True)
+                item[1].setVisible(True)
+
+            func_form["old_value"] = channel_form["functionality"].currentData()
+            parent.parentWidget().setFixedHeight(parent.parentWidget().sizeHint().height())
 
         functionality.currentIndexChanged.connect(on_functionality_changed)
 
@@ -338,6 +352,7 @@ class SettingsGui(qtw.QWidget):
 
         self.logging_form = logging_form
 
+    # TODO: add functionality to submitted stuff
     def submit_forms(self):
         print("submitting")
 
@@ -389,6 +404,7 @@ class SettingsGui(qtw.QWidget):
         self.controller.ready = True
         self.close()
 
+    # TODO: add functionality to saved stuff
     def save_settings(self):
         default_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "settings", "default.json"))
         print(default_path)
@@ -434,6 +450,7 @@ class SettingsGui(qtw.QWidget):
             s = json.dumps(settings, indent=4)
             file.write(s)
 
+    # TODO: add functionality to imported stuff
     def import_settings(self):
         print("loading settings")
         default_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "settings", "default.json"))

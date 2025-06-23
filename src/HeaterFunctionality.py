@@ -1,8 +1,10 @@
 import numpy as np
 from PyQt5 import QtWidgets as qtw
+from PyQt5 import QtGui as qtg
 from PyQt5.QtCore import Qt
 from lakeshore import Model372
 
+from src import GuiHelper
 from src.AbstractFunctionality import AbstractFunctionality
 from src.InputData import range_text_converter
 
@@ -72,14 +74,16 @@ class HeaterFunctionality(AbstractFunctionality):
         self.heater_active = False
 
 
-def load_gui_elements(parent):
+def load_gui_elements(parent: qtw.QWidget):
     print("loading elements")
     layout = parent.layout()
     form = {}
+    if not isinstance(layout, qtw.QFormLayout):
+        return form
 
     use_threshold = qtw.QCheckBox(parent)
     use_threshold.setChecked(True)
-    layout.addRow("Threshold:", use_threshold)
+    layout.addRow("Threshold", use_threshold)
     form["threshold"] = use_threshold
 
     activation_threshold = qtw.QDoubleSpinBox()

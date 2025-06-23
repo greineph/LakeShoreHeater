@@ -6,7 +6,7 @@ class AbstractFunctionality:
 
 
 def load_gui_elements(parent):
-    pass
+    return {}
 
 
 def extract_data(gui_elements):
