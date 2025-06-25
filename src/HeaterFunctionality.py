@@ -29,7 +29,7 @@ class HeaterFunctionality(AbstractFunctionality):
         self.threshold_delta = threshold_delta
 
         self.use_stability = use_stability
-        self.number_of_values = number_of_values
+        self.number_of_values = number_of_values if use_stability else 1
         self.recent_values = []
         self.deviation = deviation
         self.max_threshold = max_threshold

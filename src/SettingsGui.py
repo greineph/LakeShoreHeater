@@ -352,7 +352,6 @@ class SettingsGui(qtw.QWidget):
 
         self.logging_form = logging_form
 
-    # TODO: add functionality to submitted stuff
     def submit_forms(self):
         print("submitting")
 
@@ -413,7 +412,6 @@ class SettingsGui(qtw.QWidget):
         self.controller.ready = True
         self.close()
 
-    # TODO: add functionality to saved stuff
     def save_settings(self):
         default_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "settings", "default.json"))
         print(default_path)
@@ -434,6 +432,11 @@ class SettingsGui(qtw.QWidget):
                                  "plot": reading["plot"].isChecked(),
                                  "custom_name": reading["custom_name"].text()})
 
+            func = GuiHelper.get_data_from_widget(channel_form["functionality"])
+            func_form = {}
+            for item in channel_form["functionality_form"][func].items():
+                func_form[item[0]] = GuiHelper.get_save_data_from_widget(item[1])
+
             settings["channels"].append({"channel": channel_form["channel"].currentIndex(),
                                          "calibration": channel_form["calibration"].currentIndex(),
                                          "excitation_mode": channel_form["excitation_mode"].currentIndex(),
@@ -442,7 +445,9 @@ class SettingsGui(qtw.QWidget):
                                          "shunted": channel_form["shunted"].isChecked(),
                                          "units": channel_form["units"].currentIndex(),
                                          "resistance_range": channel_form["resistance_range"].currentIndex(),
-                                         "readings": readings})
+                                         "readings": readings,
+                                         "functionality": channel_form["functionality"].currentIndex(),
+                                         "functionality_form": func_form})
 
         mpv_readings = []
         for reading in self.mpv_form["readings"]:
@@ -489,6 +494,11 @@ class SettingsGui(qtw.QWidget):
                 reading_form["log"].setChecked(reading_settings["log"])
                 reading_form["plot"].setChecked(reading_settings["plot"])
                 reading_form["custom_name"].setText(reading_settings["custom_name"])
+            GuiHelper.change_widget_with_data(channel_form["functionality"], channel_settings["functionality"])
+            func_settings = channel_settings["functionality_form"]
+            func_form = channel_form["functionality_form"][GuiHelper.get_data_from_widget(channel_form["functionality"])]
+            for item in func_settings.items():
+                GuiHelper.change_widget_with_data(func_form[item[0]], item[1])
 
         mpv_form = self.mpv_form
         mpv_settings = settings["mpv"]
