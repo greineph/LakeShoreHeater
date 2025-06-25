@@ -2,6 +2,7 @@ from Device import Device
 from lakeshore import Model372, Model372InputSetupSettings
 import InputData
 import TemperatureCalibration
+from src.AbstractFunctionality import AbstractFunctionality
 
 
 class Channel:
@@ -16,6 +17,7 @@ class Channel:
         self.wanted_plotting_names = []
         self.calibration = "None"
         # self.set_filter()
+        self.functionality = None
 
     # returns readings of {kelvin, resistance, power} as dictionary
     def get_readings(self):
@@ -54,6 +56,10 @@ class Channel:
 
     def get_input_channel(self):
         return self.input_channel
+
+    def add_functionality(self, functionality: AbstractFunctionality):
+        self.functionality = functionality
+        functionality.add_channel(self)
 
 
 # holds and processes all the relevant data defined in the settings menu

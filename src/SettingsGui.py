@@ -11,7 +11,7 @@ import sys
 from InputData import range_text_converter
 from Channel import ChannelSettings
 from MPVWrapper import MPVSettings
-from src import TemperatureCalibration
+from src import TemperatureCalibration, GuiHelper
 import FunctionalityFunctions
 
 from UliEngineering.Electronics.Resistors import resistor_tolerance
@@ -384,7 +384,16 @@ class SettingsGui(qtw.QWidget):
                                                resistance_range=channel_form["resistance_range"].currentData(),
                                                readings=readings)
             print(channel_settings)
-            self.controller.create_channel(channel_settings)
+            func = GuiHelper.get_data_from_widget(channel_form["functionality"])
+            print(func)
+            func_form = channel_form["functionality_form"][func]
+            print(func_form)
+            functionality_data = FunctionalityFunctions.functions[func]["extract"](func_form)
+            print(functionality_data)
+            functionality = FunctionalityFunctions.functions[func]["create"](functionality_data)
+            print(functionality)
+
+            self.controller.create_channel(channel_settings, functionality)
             # print(channel_settings.create_channel(Device.get_device()))
 
         mpv_readings = []

@@ -1,6 +1,7 @@
 from lakeshore import Model372
 import InputData
 from Channel import Channel
+from src.AbstractFunctionality import AbstractFunctionality
 from src.Device import Device
 from src.Datahub import Datahub
 from src.Heater import Heater
@@ -36,8 +37,10 @@ class Controller:
         #     print("something went wrong")
         #     self.datahub.write_csv(name="emergency_out")
 
-    def create_channel(self, settings: ChannelSettings):
-        self.channels.append(settings.create_channel(Device.get_device()))
+    def create_channel(self, settings: ChannelSettings, functionality: AbstractFunctionality):
+        channel = settings.create_channel(Device.get_device())
+        channel.add_functionality(functionality)
+        self.channels.append(channel)
 
     def create_mpv_wrapper(self, settings: MPVSettings):
         self.mpv_wrapper = settings.create_mpv_wrapper()

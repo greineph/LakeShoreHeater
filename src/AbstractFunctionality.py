@@ -1,7 +1,16 @@
 
 class AbstractFunctionality:
 
-    def __init__(self, channel):
+    def __init__(self):
+        self.channel = None
+
+    def start(self):
+        pass
+
+    def stop(self):
+        pass
+
+    def add_channel(self, channel):
         self.channel = channel
 
 
@@ -10,8 +19,10 @@ def load_gui_elements(parent):
 
 
 def extract_data(gui_elements):
+    print("extract abstract data")
     return {}
 
 
-def create_instance(channel, data):
-    return None
+def create_instance(data):
+    print("create abstract instance")
+    return AbstractFunctionality()

@@ -4,20 +4,20 @@ from PyQt5 import QtGui as qtg
 from PyQt5.QtCore import Qt
 from lakeshore import Model372
 
-from src import GuiHelper
+import src.GuiHelper as GuiHelper
 from src.AbstractFunctionality import AbstractFunctionality
 from src.InputData import range_text_converter
 
 
 class HeaterFunctionality(AbstractFunctionality):
 
-    def __init__(self, channel, use_threshold, activation_threshold, deactivation_threshold, threshold_delta,
+    def __init__(self, use_threshold, activation_threshold, deactivation_threshold, threshold_delta,
                  use_stability, number_of_values, deviation, max_threshold, active_excitation, interval):
-        super().__init__(channel)
+        super().__init__()
         self.heater_active = False
 
         self.use_threshold = use_threshold
-        self.current_value = 9999.9
+        self.current_value = np.nan
         self.activation_threshold = activation_threshold
         self.deactivation_threshold = deactivation_threshold
         self.threshold_delta = threshold_delta
@@ -29,8 +29,14 @@ class HeaterFunctionality(AbstractFunctionality):
         self.max_threshold = max_threshold
 
         self.active_excitation = active_excitation
-        self.idle_excitation = channel.get_setup_settings().excitation_range
+        self.idle_excitation = None
         self.interval = interval
+
+    def start(self):
+        pass
+
+    def stop(self):
+        pass
 
     # activates/deactivates the heater based on criteria set during initialisation
     def update(self):
@@ -42,7 +48,7 @@ class HeaterFunctionality(AbstractFunctionality):
 
         elif self.use_stability:
             std = np.std(self.recent_values)
-            if std < self.deviation and self.current_value < self.max_threshold:
+            if std < self.deviation and self.current_value < self.max_threshold and len(self.recent_values) == self.number_of_values:
                 self.activate_heater()
             elif std > self.deviation:
                 self.deactivate_heater()
@@ -72,6 +78,10 @@ class HeaterFunctionality(AbstractFunctionality):
         settings.excitation_range = self.idle_excitation
         self.channel.configure_setup_settings(settings)
         self.heater_active = False
+
+    def add_channel(self, channel):
+        self.channel = channel
+        self.idle_excitation = channel.get_setup_settings().excitation_range
 
 
 def load_gui_elements(parent: qtw.QWidget):
@@ -188,11 +198,21 @@ def load_gui_elements(parent: qtw.QWidget):
     return form
 
 
-# TODO: implement
 def extract_data(gui_elements):
-    pass
+    data = {}
+    for key in gui_elements.keys():
+        data[key] = GuiHelper.get_data_from_widget(gui_elements[key])
+    return data
 
 
-# TODO: implement
-def create_instance(channel, data):
-    pass
+def create_instance(data):
+    return HeaterFunctionality(use_threshold=data["threshold"],
+                               activation_threshold=data["activation"],
+                               deactivation_threshold=data["deactivation"],
+                               threshold_delta=data["delta"],
+                               use_stability=data["stability"],
+                               number_of_values=data["values"],
+                               deviation=data["deviation"],
+                               max_threshold=data["max"],
+                               active_excitation=data["active"],
+                               interval=data["interval"])
