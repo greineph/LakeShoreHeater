@@ -1,8 +1,11 @@
+import time
+
 import numpy as np
 from PyQt5 import QtWidgets as qtw
 from PyQt5 import QtGui as qtg
 from PyQt5.QtCore import Qt
 from lakeshore import Model372
+import threading
 
 import src.GuiHelper as GuiHelper
 from src.AbstractFunctionality import AbstractFunctionality
@@ -15,6 +18,9 @@ class HeaterFunctionality(AbstractFunctionality):
                  use_stability, number_of_values, deviation, max_threshold, active_excitation, interval):
         super().__init__()
         self.heater_active = False
+        self.mpv_wrapper = None
+        self.thread = None
+        self.is_running = False
 
         self.use_threshold = use_threshold
         self.current_value = np.nan
@@ -33,10 +39,23 @@ class HeaterFunctionality(AbstractFunctionality):
         self.interval = interval
 
     def start(self):
-        pass
+        print("start functionality of heater")
+        print(self.mpv_wrapper)
+        self.is_running = True
+        def run(heater: HeaterFunctionality, mpv_wrapper):
+            start_time = time.monotonic()
+            while heater.is_running:
+                heater.add_value(mpv_wrapper.get_readings()["field"])
+                heater.update()
+                time.sleep(heater.interval - ((time.monotonic() - start_time) % heater.interval))
+
+
+        self.thread = threading.Thread(target=run, args=(self, self.mpv_wrapper))
+        self.thread.start()
+
 
     def stop(self):
-        pass
+        self.is_running = False
 
     # activates/deactivates the heater based on criteria set during initialisation
     def update(self):
@@ -55,15 +74,18 @@ class HeaterFunctionality(AbstractFunctionality):
 
     # add a new value to be used in update
     def add_value(self, value):
+        self.current_value = value
         self.recent_values.append(value)
         if len(self.recent_values) > self.number_of_values:
             self.recent_values.remove(self.recent_values[0])
+        print(f"recent vals: {self.recent_values}")
 
     # activates the heater of associated channel by changing excitation range
     def activate_heater(self):
         if self.heater_active:
             return
 
+        print("activating heater")
         settings = self.channel.get_setup_settings()
         settings.excitation_range = self.active_excitation
         self.channel.configure_setup_settings(settings)
@@ -74,6 +96,7 @@ class HeaterFunctionality(AbstractFunctionality):
         if not self.heater_active:
             return
 
+        print("deactivating heater")
         settings = self.channel.get_setup_settings()
         settings.excitation_range = self.idle_excitation
         self.channel.configure_setup_settings(settings)
@@ -82,6 +105,10 @@ class HeaterFunctionality(AbstractFunctionality):
     def add_channel(self, channel):
         self.channel = channel
         self.idle_excitation = channel.get_setup_settings().excitation_range
+
+    def provide_dependencies(self, controller):
+        self.mpv_wrapper = controller.mpv_wrapper
+        print(controller.mpv_wrapper)
 
 
 def load_gui_elements(parent: qtw.QWidget):

@@ -49,9 +49,9 @@ class Channel:
     def get_wanted_readings(self) -> list:
         readings = self.get_readings()
         if "resistance" in self.wanted_reading_keys:
-            print(f"original value: {readings['resistance']}")
+            # print(f"original value: {readings['resistance']}")
             readings["resistance"] = TemperatureCalibration.functions[self.calibration](readings["resistance"])
-            print(f"using {self.calibration}: {readings['resistance']}")
+            # print(f"using {self.calibration}: {readings['resistance']}")
         return [readings[key] for key in self.wanted_reading_keys]
 
     def get_input_channel(self):
@@ -60,6 +60,12 @@ class Channel:
     def add_functionality(self, functionality: AbstractFunctionality):
         self.functionality = functionality
         functionality.add_channel(self)
+
+    def start_functionality(self):
+        self.functionality.start()
+
+    def stop_functionality(self):
+        self.functionality.stop()
 
 
 # holds and processes all the relevant data defined in the settings menu

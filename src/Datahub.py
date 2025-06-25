@@ -38,6 +38,8 @@ class Datahub:
                                  logging_interval=logging_interval)
         self.reader.daemon = True
         self.reader.add_subscriber(self)
+        for ch in self.channels:
+            ch.start_functionality()
 
         plotting_names = []
         for ch in self.channels:

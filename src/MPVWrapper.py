@@ -28,6 +28,13 @@ class MPVWrapper:
     def get_wanted_reading_keys(self) -> list[str]:
         return self.wanted_reading_keys
 
+    # returns all possible readings as dict
+    def get_readings(self):
+        readings = {}
+        for key in self.key_to_function:
+            readings[key] = self.key_to_function[key]()[0]
+        return readings
+
     # handles shutting down the properties in this wrapper
     def shutdown(self):
         self.client.close_client()

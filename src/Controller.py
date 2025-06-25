@@ -22,6 +22,7 @@ class Controller:
         self.save_path = ""
         Gui.show_gui(self)
         self.datahub = Datahub(channels=self.channels, mpv_wrapper=self.mpv_wrapper, save_path=self.save_path)
+        self.provide_dependencies()
 
     # starts the process
     # TODO: set_scanner_status to relevant channel
@@ -44,6 +45,10 @@ class Controller:
 
     def create_mpv_wrapper(self, settings: MPVSettings):
         self.mpv_wrapper = settings.create_mpv_wrapper()
+
+    def provide_dependencies(self):
+        for ch in self.channels:
+            ch.functionality.provide_dependencies(self)
 
 
     # TODO: behaviour for stopping/exiting

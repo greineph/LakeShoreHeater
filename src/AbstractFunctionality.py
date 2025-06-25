@@ -13,6 +13,9 @@ class AbstractFunctionality:
     def add_channel(self, channel):
         self.channel = channel
 
+    def provide_dependencies(self, controller):
+        pass
+
 
 def load_gui_elements(parent):
     return {}
