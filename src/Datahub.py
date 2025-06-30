@@ -6,7 +6,7 @@ import pandas as pd
 
 from Channel import Channel
 from src import InputData
-from src.DataReader import DataReader
+from src.DataReader import DataReader, Instructions
 from src.LiveGraph import LiveGraph
 from MPVWrapper import MPVWrapper
 
@@ -31,12 +31,14 @@ class Datahub:
 
         self.reader = None
         self.graph = None
+        self.instruction_queue = []
 
     # creates Threads to continuously read, log and show data until destroyed
     def start_logging(self, logging_interval=5):
         self.reader = DataReader(channels=self.channels,
                                  mpv_wrapper=self.mpv_wrapper,
-                                 logging_interval=logging_interval)
+                                 logging_interval=logging_interval,
+                                 instruction_queue=self.instruction_queue)
         self.reader.daemon = True
         self.reader.add_subscriber(self)
         for ch in self.channels:
@@ -53,12 +55,20 @@ class Datahub:
         if not self.append_to_file:
             self.write_csv(self.save_path)
 
+        print("starting reader")
         self.reader.start()
-        self.graph.initialize()
+        print("reader started")
+        # self.graph.initialize()
 
         while True:
             time.sleep(0.1)
-            self.graph.update()
+            # self.graph.update()
+
+    def pause_logging(self):
+        self.instruction_queue.append(Instructions.PAUSE)
+
+    def unpause_logging(self):
+        self.instruction_queue.append(Instructions.UNPAUSE)
 
     # appends {data} to self.df
     def update(self, data):

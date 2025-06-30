@@ -17,7 +17,6 @@ import FunctionalityFunctions
 from UliEngineering.Electronics.Resistors import resistor_tolerance
 from lakeshore import Model372
 
-from src.AbstractFunctionality import AbstractFunctionality
 
 
 class SettingsGui(qtw.QWidget):
@@ -35,7 +34,9 @@ class SettingsGui(qtw.QWidget):
 
         self.setGeometry(100, 100, 1000, 800)
         self.setWindowState(Qt.WindowMaximized)
-        self.setWindowTitle("Setup")
+        self.setWindowTitle("  Setup")
+        path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "resources", "icon.png"))
+        self.setWindowIcon(qtg.QIcon(path))
 
         self.setLayout(qtw.QVBoxLayout())
         self.layout().setContentsMargins(0, 0, 0, 0)

@@ -1,3 +1,5 @@
+from threading import Thread
+
 from lakeshore import Model372
 import InputData
 from Channel import Channel
@@ -9,6 +11,7 @@ from src.Thermometer import Thermometer
 from src.Channel import Channel, ChannelSettings
 from MPVWrapper import MPVWrapper, MPVSettings
 import src.SettingsGui as SettingsGui
+import src.ActiveGui as ActiveGui
 
 
 class Controller:
@@ -32,12 +35,21 @@ class Controller:
             return
 
         print("starting process")
+        gui_thread = Thread(target=ActiveGui.show_gui, args=[self], daemon=True)
+        gui_thread.start()
+        print("gui started")
         self.datahub.start_logging(self.logging_interval)
         # try:
         #     self.datahub.start_logging(self.logging_interval)
         # except:
         #     print("something went wrong")
         #     self.datahub.write_csv(name="emergency_out")
+
+    def pause_logging(self):
+        self.datahub.pause_logging()
+
+    def unpause_logging(self):
+        self.datahub.unpause_logging()
 
     def create_channel(self, settings: ChannelSettings, functionality: AbstractFunctionality):
         channel = settings.create_channel(Device.get_device())
