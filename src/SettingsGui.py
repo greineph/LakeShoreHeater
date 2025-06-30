@@ -201,7 +201,7 @@ class SettingsGui(qtw.QWidget):
             quadrature_boxes["plot"].setEnabled(False)
             quadrature_boxes["custom_name"].setEnabled(False)
 
-        # TODO: could handle functionality gui generation in its class for easy extendability
+
         functionality = qtw.QComboBox(parent)
         functionality.addItem("Basic", "Basic")
         functionality.addItem("Heater", "Heater")
@@ -469,7 +469,6 @@ class SettingsGui(qtw.QWidget):
             s = json.dumps(settings, indent=4)
             file.write(s)
 
-    # TODO: add functionality to imported stuff
     def import_settings(self):
         print("loading settings")
         default_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "settings", "default.json"))

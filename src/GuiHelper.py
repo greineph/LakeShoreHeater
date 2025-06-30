@@ -4,7 +4,6 @@ from PyQt5.QtCore import Qt
 
 # this file aims to provide useful functions when handling pyqt stuff
 
-# TODO: finish
 def get_data_from_widget(widget: qtw.QWidget):
     match type(widget):
         case qtw.QComboBox:

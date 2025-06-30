@@ -16,7 +16,6 @@ class LiveGraph:
         self.ln = None
         self.lines: list[plt.Line2D] = []
 
-    # TODO: initialize plot style and labels and stuff
     def initialize(self):
         df = self.datahub.get_data()
         style.use("seaborn-v0_8-whitegrid")
@@ -32,7 +31,6 @@ class LiveGraph:
         plt.tight_layout()
         plt.pause(0.2)
 
-    # TODO: update graph in mainloop, add bools for control
     def update(self):
         df = self.datahub.get_data()
         if len(df) < 1:

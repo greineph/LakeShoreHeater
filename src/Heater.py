@@ -3,7 +3,7 @@ from lakeshore import Model372InputSetupSettings
 import InputData
 from src.InputData import SENSOR_EXCITATION_MODE_HEATER
 
-
+# [deprecated]
 class Heater(Channel):
 
     # creates input setup settings for heater from InputData.py
@@ -19,7 +19,3 @@ class Heater(Channel):
     # @override
     def get_wanted_reading_keys(self) -> list[str]:
         return InputData.WANTED_READINGS_HEATER
-
-    # TODO: heaters (sample, warm up, analog, other): channel heater for base functionality other heaters for possible cryopump
-
-    # TODO: enable/disable channel heater

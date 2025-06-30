@@ -8,7 +8,6 @@ from src.AbstractFunctionality import AbstractFunctionality
 class Channel:
 
     # TODO: maybe use Device class to get device instead of parameter
-    # TODO: specialfunctionality attribute (for heating stuff)
     def __init__(self, device: Model372, input_channel: Model372.InputChannel):
         self.device = device
         self.input_channel = input_channel
