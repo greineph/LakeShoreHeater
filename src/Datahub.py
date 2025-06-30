@@ -13,7 +13,7 @@ from MPVWrapper import MPVWrapper
 
 class Datahub:
 
-    def __init__(self, channels: list[Channel], mpv_wrapper: MPVWrapper = None, save_path="", append_to_file=False):
+    def __init__(self, channels: list[Channel], mpv_wrapper: MPVWrapper = None, save_path="", append_to_file=False, controller=None):
         self.channels = channels
         self.mpv_wrapper = mpv_wrapper
         if len(save_path) > 0:
@@ -32,6 +32,7 @@ class Datahub:
         self.reader = None
         self.graph = None
         self.instruction_queue = []
+        self.controller = controller
 
     # creates Threads to continuously read, log and show data until destroyed
     def start_logging(self, logging_interval=5):
@@ -58,11 +59,11 @@ class Datahub:
         print("starting reader")
         self.reader.start()
         print("reader started")
-        # self.graph.initialize()
+        self.graph.initialize()
 
         while True:
             time.sleep(0.1)
-            # self.graph.update()
+            self.graph.update()
 
     def pause_logging(self):
         self.instruction_queue.append(Instructions.PAUSE)

@@ -25,7 +25,11 @@ class Controller:
         self.save_path = ""
         self.append_to_file = False
         SettingsGui.show_gui(self)
-        self.datahub = Datahub(channels=self.channels, mpv_wrapper=self.mpv_wrapper, save_path=self.save_path, append_to_file=self.append_to_file)
+        self.datahub = Datahub(channels=self.channels,
+                               mpv_wrapper=self.mpv_wrapper,
+                               save_path=self.save_path,
+                               append_to_file=self.append_to_file,
+                               controller=self)
         self.provide_dependencies()
 
     # starts the process
@@ -35,9 +39,6 @@ class Controller:
             return
 
         print("starting process")
-        gui_thread = Thread(target=ActiveGui.show_gui, args=[self], daemon=True)
-        gui_thread.start()
-        print("gui started")
         self.datahub.start_logging(self.logging_interval)
         # try:
         #     self.datahub.start_logging(self.logging_interval)
@@ -62,6 +63,11 @@ class Controller:
     def provide_dependencies(self):
         for ch in self.channels:
             ch.functionality.provide_dependencies(self)
+
+    def show_active_gui(self):
+        gui_thread = Thread(target=ActiveGui.show_gui, args=[self], daemon=True)
+        gui_thread.start()
+        print("gui started")
 
 
     # TODO: behaviour for stopping/exiting
