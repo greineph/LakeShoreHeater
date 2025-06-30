@@ -8,7 +8,7 @@ from src.Heater import Heater
 from src.Thermometer import Thermometer
 from src.Channel import Channel, ChannelSettings
 from MPVWrapper import MPVWrapper, MPVSettings
-import src.SettingsGui as Gui
+import src.SettingsGui as SettingsGui
 
 
 class Controller:
@@ -20,8 +20,9 @@ class Controller:
         self.ready = False
         self.logging_interval = 5
         self.save_path = ""
-        Gui.show_gui(self)
-        self.datahub = Datahub(channels=self.channels, mpv_wrapper=self.mpv_wrapper, save_path=self.save_path)
+        self.append_to_file = False
+        SettingsGui.show_gui(self)
+        self.datahub = Datahub(channels=self.channels, mpv_wrapper=self.mpv_wrapper, save_path=self.save_path, append_to_file=self.append_to_file)
         self.provide_dependencies()
 
     # starts the process

@@ -13,13 +13,14 @@ from MPVWrapper import MPVWrapper
 
 class Datahub:
 
-    def __init__(self, channels: list[Channel], mpv_wrapper: MPVWrapper = None, save_path=""):
+    def __init__(self, channels: list[Channel], mpv_wrapper: MPVWrapper = None, save_path="", append_to_file=False):
         self.channels = channels
         self.mpv_wrapper = mpv_wrapper
         if len(save_path) > 0:
             self.save_path = save_path
         else:
             self.save_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "data", "default.csv"))
+        self.append_to_file = append_to_file
 
         columns = ["timestamp", "timedelta"]
         for ch in self.channels:
@@ -49,7 +50,8 @@ class Datahub:
         self.graph = LiveGraph(datahub=self,
                                x_axis="timedelta",
                                y_axis=plotting_names)
-        self.write_csv(self.save_path)
+        if not self.append_to_file:
+            self.write_csv(self.save_path)
 
         self.reader.start()
         self.graph.initialize()
@@ -65,7 +67,7 @@ class Datahub:
             file.write(",".join([str(i) for i in data]) + "\n")
         print(data)
 
-    # creates a csv file from the current data in self.df to {path} as {name}
+    # creates a csv file from the current data in self.df in {path}
     def write_csv(self, path: str = "./data/out.csv"):
         self.df.to_csv(path, encoding="utf-8", index=False)
 

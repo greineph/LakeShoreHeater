@@ -34,6 +34,7 @@ class SettingsGui(qtw.QWidget):
         self.filename = "default.json"
 
         self.setGeometry(100, 100, 1000, 800)
+        self.setWindowState(Qt.WindowMaximized)
         self.setWindowTitle("Setup")
 
         self.setLayout(qtw.QVBoxLayout())
@@ -337,7 +338,7 @@ class SettingsGui(qtw.QWidget):
 
         logging_form = {}
 
-        interval = qtw.QDoubleSpinBox()
+        interval = qtw.QDoubleSpinBox(parent)
         interval.setRange(1, 100)
         interval.setValue(2)
         interval.setSuffix("s")
@@ -346,22 +347,26 @@ class SettingsGui(qtw.QWidget):
         form_layout.addRow("Interval:", interval)
         logging_form["interval"] = interval
 
-        # directory = qtw.QLabel(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "data", "default.csv")))
-        # form_layout.addRow(directory)
-        # logging_form["directory"] = directory
+        append_file = qtw.QCheckBox(parent)
+        form_layout.addRow("Append Existing File:", append_file)
+        logging_form["append"] = append_file
 
         self.logging_form = logging_form
 
     def submit_forms(self):
         print("submitting")
-
         default_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "data", "default.csv"))
         print(default_path)
-        save_path = qtw.QFileDialog.getSaveFileName(self, "Save", default_path)[0]
-        print(save_path)
-        self.controller.save_path = save_path
 
-        # self.close()
+        if GuiHelper.get_data_from_widget(self.logging_form["append"]):
+            save_path = qtw.QFileDialog.getOpenFileName(self, "Save", default_path)[0]
+            print(save_path)
+            self.controller.append_to_file = True
+        else:
+            save_path = qtw.QFileDialog.getSaveFileName(self, "Save", default_path)[0]
+            print(save_path)
+            self.controller.append_to_file = False
+        self.controller.save_path = save_path
 
         for channel_form in self.channel_forms:
             readings = []
