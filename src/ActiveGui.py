@@ -28,6 +28,7 @@ class ActiveGui(qtw.QWidget):
         self.setStyleSheet(" QToolTip{ font: 16pt }")
         self.setToolTipDuration(0)
 
+        # possibly unnecessary
         pause_unpause = qtw.QPushButton(self)
         pause_unpause.setText("Pause")
         self.paused = False

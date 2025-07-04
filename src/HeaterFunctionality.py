@@ -123,19 +123,20 @@ def load_gui_elements(parent: qtw.QWidget):
     layout.addRow("Threshold", use_threshold)
     form["threshold"] = use_threshold
 
+    # TODO: make normal spinbox
     activation_threshold = qtw.QDoubleSpinBox()
-    activation_threshold.setRange(0, 10000)
+    activation_threshold.setRange(0, 200000)
     activation_threshold.setValue(1)
-    activation_threshold.setSuffix("B")
+    activation_threshold.setSuffix(" Oe")
     activation_threshold.setButtonSymbols(qtw.QAbstractSpinBox.ButtonSymbols.NoButtons)
     activation_threshold.setAlignment(Qt.AlignRight)
     layout.addRow("Activates at:", activation_threshold)
     form["activation"] = activation_threshold
 
     deactivation_threshold = qtw.QDoubleSpinBox()
-    deactivation_threshold.setRange(0, 10000)
+    deactivation_threshold.setRange(0, 200000)
     deactivation_threshold.setValue(100)
-    deactivation_threshold.setSuffix("B")
+    deactivation_threshold.setSuffix("Oe")
     deactivation_threshold.setButtonSymbols(qtw.QAbstractSpinBox.ButtonSymbols.NoButtons)
     deactivation_threshold.setAlignment(Qt.AlignRight)
     layout.addRow("Deactivates at:", deactivation_threshold)
@@ -179,7 +180,6 @@ def load_gui_elements(parent: qtw.QWidget):
     layout.addRow("Max Threshold:", max_threshold)
     form["max"] = max_threshold
 
-    # TODO: change type depending on mode
     active_excitation = qtw.QComboBox(parent)
     for x in Model372.MeasurementInputCurrentRange:
         active_excitation.addItem(range_text_converter(x.name), x)

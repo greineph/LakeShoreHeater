@@ -2,6 +2,7 @@ import MultiPyVu as mpv
 import InputData
 
 
+# TODO: make thread save
 class MPVWrapper:
 
     def __init__(self):

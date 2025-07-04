@@ -45,6 +45,7 @@ class Channel:
     def get_wanted_reading_keys(self) -> list[str]:
         raise NotImplementedError("Implement this method in subclass")
 
+    # TODO: override kelvin when calibration is selected
     def get_wanted_readings(self) -> list:
         readings = self.get_readings()
         if "resistance" in self.wanted_reading_keys:

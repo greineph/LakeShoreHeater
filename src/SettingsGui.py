@@ -187,6 +187,7 @@ class SettingsGui(qtw.QWidget):
         form_layout.addRow("Units:", units)
         channel_form["units"] = units
 
+        #TODO: disable/hide for channel A
         resistance_range = qtw.QComboBox(parent)
         for x in Model372.MeasurementInputResistance:
             resistance_range.addItem(range_text_converter(x.name), x)

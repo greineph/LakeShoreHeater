@@ -11,8 +11,7 @@ CHANNEL_HEATER = Model372.InputChannel.ONE
 # sensor excitation mode of heater (current, voltage)
 SENSOR_EXCITATION_MODE_HEATER = Model372.SensorExcitationMode.CURRENT
 # excitation range of heater (Channel 1-16: MeasurementInputRange, A: ControlInputCurrentRange)
-EXCITATION_RANGE_HEATER = Model372.MeasurementInputCurrentRange.RANGE_1_MICRO_AMP
-# auto range mode of heater (off, current)
+EXCITATION_RANGE_HEATER = Model372.MeasurementInputCurrentRange.RANGE_100_MICRO_AMPS
 AUTO_RANGE_MODE_HEATER = Model372.AutoRangeMode.CURRENT
 # shunt current source of heater (True, False)
 CURRENT_SOURCE_SHUNTED_HEATER = False
@@ -41,6 +40,17 @@ UNITS_THERMOMETER = Model372.InputSensorUnits.OHMS
 RESISTANCE_RANGE_THERMOMETER = Model372.MeasurementInputResistance.RANGE_63_POINT_2_KIL_OHMS
 # list of wanted readings ["kelvin", "resistance", "power", "quadrature"(not in Control channel)] for thermometer
 WANTED_READINGS_THERMOMETER = ["kelvin", "resistance", "power"]
+
+# Heater:
+#activates: 100
+#deactivates: 500
+#delta: bye bye
+
+#num: 5
+#deviation: 3
+#max: 50000
+#excitation: 100µA
+#interval 2s
 
 
 # Settings for MPV
