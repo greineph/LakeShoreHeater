@@ -18,7 +18,6 @@ from UliEngineering.Electronics.Resistors import resistor_tolerance
 from lakeshore import Model372
 
 
-
 class SettingsGui(qtw.QWidget):
 
     def __init__(self, controller=None):
@@ -187,7 +186,7 @@ class SettingsGui(qtw.QWidget):
         form_layout.addRow("Units:", units)
         channel_form["units"] = units
 
-        #TODO: disable/hide for channel A
+        # TODO: disable/hide for channel A
         resistance_range = qtw.QComboBox(parent)
         for x in Model372.MeasurementInputResistance:
             resistance_range.addItem(range_text_converter(x.name), x)
@@ -203,7 +202,6 @@ class SettingsGui(qtw.QWidget):
             quadrature_boxes["plot"].setEnabled(False)
             quadrature_boxes["custom_name"].setEnabled(False)
 
-
         functionality = qtw.QComboBox(parent)
         functionality.addItem("Basic", "Basic")
         functionality.addItem("Heater", "Heater")
@@ -217,7 +215,6 @@ class SettingsGui(qtw.QWidget):
             for item in channel_form["functionality_form"][key].items():
                 item[1].setVisible(False)
                 form_layout.labelForField(item[1]).setVisible(False)
-
 
         def on_channel_changed(value=0):
             quad_boxes = channel_form["readings"][3]
@@ -252,7 +249,7 @@ class SettingsGui(qtw.QWidget):
                 else:
                     for x in Model372.MeasurementInputCurrentRange:
                         excitation_range.addItem(range_text_converter(x.name), x)
-            else:           # voltage
+            else:  # voltage
                 for x in Model372.MeasurementInputVoltageRange:
                     excitation_range.addItem(range_text_converter(x.name), x)
 
@@ -502,7 +499,8 @@ class SettingsGui(qtw.QWidget):
                 reading_form["custom_name"].setText(reading_settings["custom_name"])
             GuiHelper.change_widget_with_data(channel_form["functionality"], channel_settings["functionality"])
             func_settings = channel_settings["functionality_form"]
-            func_form = channel_form["functionality_form"][GuiHelper.get_data_from_widget(channel_form["functionality"])]
+            func_form = channel_form["functionality_form"][
+                GuiHelper.get_data_from_widget(channel_form["functionality"])]
             for item in func_settings.items():
                 GuiHelper.change_widget_with_data(func_form[item[0]], item[1])
 

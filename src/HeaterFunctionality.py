@@ -10,11 +10,12 @@ import threading
 import src.GuiHelper as GuiHelper
 from src.AbstractFunctionality import AbstractFunctionality
 from src.InputData import range_text_converter
+from src.MPVWrapper import MPVWrapper
 
 
 class HeaterFunctionality(AbstractFunctionality):
 
-    def __init__(self, use_threshold, activation_threshold, deactivation_threshold, threshold_delta,
+    def __init__(self, use_threshold, activation_threshold, deactivation_threshold,
                  use_stability, number_of_values, deviation, max_threshold, active_excitation, interval):
         super().__init__()
         self.heater_active = False
@@ -26,7 +27,7 @@ class HeaterFunctionality(AbstractFunctionality):
         self.current_value = np.nan
         self.activation_threshold = activation_threshold
         self.deactivation_threshold = deactivation_threshold
-        self.threshold_delta = threshold_delta
+        # self.threshold_delta = threshold_delta
 
         self.use_stability = use_stability
         self.number_of_values = number_of_values if use_stability else 1
@@ -42,17 +43,16 @@ class HeaterFunctionality(AbstractFunctionality):
         print("start functionality of heater")
         print(self.mpv_wrapper)
         self.is_running = True
-        def run(heater: HeaterFunctionality, mpv_wrapper):
+
+        def run(heater: HeaterFunctionality, mpv_wrapper: MPVWrapper):
             start_time = time.monotonic()
             while heater.is_running:
-                heater.add_value(mpv_wrapper.get_readings()["field"])
+                heater.add_value(mpv_wrapper.get_field())
                 heater.update()
                 time.sleep(heater.interval - ((time.monotonic() - start_time) % heater.interval))
 
-
-        self.thread = threading.Thread(target=run, args=(self, self.mpv_wrapper))
+        self.thread = threading.Thread(target=run, args=(self, self.mpv_wrapper), daemon=True)
         self.thread.start()
-
 
     def stop(self):
         self.is_running = False
@@ -60,14 +60,15 @@ class HeaterFunctionality(AbstractFunctionality):
     # activates/deactivates the heater based on criteria set during initialisation
     def update(self):
         if self.use_threshold:
-            if self.current_value < self.activation_threshold + self.threshold_delta:
+            if self.current_value <= self.activation_threshold:
                 self.activate_heater()
-            elif self.current_value > self.deactivation_threshold - self.threshold_delta:
+            elif self.current_value >= self.deactivation_threshold:
                 self.deactivate_heater()
 
         elif self.use_stability:
             std = np.std(self.recent_values)
-            if std < self.deviation and self.current_value < self.max_threshold and len(self.recent_values) == self.number_of_values:
+            if std < self.deviation and self.current_value < self.max_threshold and len(
+                    self.recent_values) == self.number_of_values:
                 self.activate_heater()
             elif std > self.deviation:
                 self.deactivate_heater()
@@ -124,7 +125,7 @@ def load_gui_elements(parent: qtw.QWidget):
     form["threshold"] = use_threshold
 
     # TODO: make normal spinbox
-    activation_threshold = qtw.QDoubleSpinBox()
+    activation_threshold = qtw.QSpinBox()
     activation_threshold.setRange(0, 200000)
     activation_threshold.setValue(1)
     activation_threshold.setSuffix(" Oe")
@@ -133,23 +134,23 @@ def load_gui_elements(parent: qtw.QWidget):
     layout.addRow("Activates at:", activation_threshold)
     form["activation"] = activation_threshold
 
-    deactivation_threshold = qtw.QDoubleSpinBox()
+    deactivation_threshold = qtw.QSpinBox()
     deactivation_threshold.setRange(0, 200000)
     deactivation_threshold.setValue(100)
-    deactivation_threshold.setSuffix("Oe")
+    deactivation_threshold.setSuffix(" Oe")
     deactivation_threshold.setButtonSymbols(qtw.QAbstractSpinBox.ButtonSymbols.NoButtons)
     deactivation_threshold.setAlignment(Qt.AlignRight)
     layout.addRow("Deactivates at:", deactivation_threshold)
     form["deactivation"] = deactivation_threshold
 
-    threshold_delta = qtw.QDoubleSpinBox()
-    threshold_delta.setRange(0, 100)
-    threshold_delta.setValue(2)
-    threshold_delta.setSuffix("B")
-    threshold_delta.setButtonSymbols(qtw.QAbstractSpinBox.ButtonSymbols.NoButtons)
-    threshold_delta.setAlignment(Qt.AlignRight)
-    layout.addRow("Delta:", threshold_delta)
-    form["delta"] = threshold_delta
+    # threshold_delta = qtw.QDoubleSpinBox()
+    # threshold_delta.setRange(0, 100)
+    # threshold_delta.setValue(2)
+    # threshold_delta.setSuffix("B")
+    # threshold_delta.setButtonSymbols(qtw.QAbstractSpinBox.ButtonSymbols.NoButtons)
+    # threshold_delta.setAlignment(Qt.AlignRight)
+    # layout.addRow("Delta:", threshold_delta)
+    # form["delta"] = threshold_delta
 
     use_stability = qtw.QCheckBox(parent)
     layout.addRow("Stability:", use_stability)
@@ -171,10 +172,10 @@ def load_gui_elements(parent: qtw.QWidget):
     layout.addRow("Deviation:", deviation)
     form["deviation"] = deviation
 
-    max_threshold = qtw.QDoubleSpinBox()
+    max_threshold = qtw.QSpinBox()
     max_threshold.setRange(0, 10000)
     max_threshold.setValue(200)
-    max_threshold.setSuffix("B")
+    max_threshold.setSuffix(" Oe")
     max_threshold.setButtonSymbols(qtw.QAbstractSpinBox.ButtonSymbols.NoButtons)
     max_threshold.setAlignment(Qt.AlignRight)
     layout.addRow("Max Threshold:", max_threshold)
@@ -189,7 +190,7 @@ def load_gui_elements(parent: qtw.QWidget):
     interval = qtw.QDoubleSpinBox()
     interval.setRange(1, 100)
     interval.setValue(2)
-    interval.setSuffix("s")
+    interval.setSuffix(" s")
     interval.setButtonSymbols(qtw.QAbstractSpinBox.ButtonSymbols.NoButtons)
     interval.setAlignment(Qt.AlignRight)
     layout.addRow("Interval:", interval)
@@ -200,11 +201,11 @@ def load_gui_elements(parent: qtw.QWidget):
             use_stability.setChecked(False)
             activation_threshold.setEnabled(True)
             deactivation_threshold.setEnabled(True)
-            threshold_delta.setEnabled(True)
+            # threshold_delta.setEnabled(True)
         else:
             activation_threshold.setEnabled(False)
             deactivation_threshold.setEnabled(False)
-            threshold_delta.setEnabled(False)
+            # threshold_delta.setEnabled(False)
 
     use_threshold.stateChanged.connect(on_use_threshold_change)
 
@@ -236,7 +237,6 @@ def create_instance(data):
     return HeaterFunctionality(use_threshold=data["threshold"],
                                activation_threshold=data["activation"],
                                deactivation_threshold=data["deactivation"],
-                               threshold_delta=data["delta"],
                                use_stability=data["stability"],
                                number_of_values=data["values"],
                                deviation=data["deviation"],
