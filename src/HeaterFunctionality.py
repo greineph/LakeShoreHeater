@@ -124,7 +124,6 @@ def load_gui_elements(parent: qtw.QWidget):
     layout.addRow("Threshold", use_threshold)
     form["threshold"] = use_threshold
 
-    # TODO: make normal spinbox
     activation_threshold = qtw.QSpinBox()
     activation_threshold.setRange(0, 200000)
     activation_threshold.setValue(1)
