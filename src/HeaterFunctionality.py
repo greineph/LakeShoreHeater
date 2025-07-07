@@ -126,7 +126,7 @@ def load_gui_elements(parent: qtw.QWidget):
 
     activation_threshold = qtw.QSpinBox()
     activation_threshold.setRange(0, 200000)
-    activation_threshold.setValue(1)
+    activation_threshold.setValue(100)
     activation_threshold.setSuffix(" Oe")
     activation_threshold.setButtonSymbols(qtw.QAbstractSpinBox.ButtonSymbols.NoButtons)
     activation_threshold.setAlignment(Qt.AlignRight)
@@ -135,7 +135,7 @@ def load_gui_elements(parent: qtw.QWidget):
 
     deactivation_threshold = qtw.QSpinBox()
     deactivation_threshold.setRange(0, 200000)
-    deactivation_threshold.setValue(100)
+    deactivation_threshold.setValue(500)
     deactivation_threshold.setSuffix(" Oe")
     deactivation_threshold.setButtonSymbols(qtw.QAbstractSpinBox.ButtonSymbols.NoButtons)
     deactivation_threshold.setAlignment(Qt.AlignRight)
@@ -173,7 +173,7 @@ def load_gui_elements(parent: qtw.QWidget):
 
     max_threshold = qtw.QSpinBox()
     max_threshold.setRange(0, 10000)
-    max_threshold.setValue(200)
+    max_threshold.setValue(50000)
     max_threshold.setSuffix(" Oe")
     max_threshold.setButtonSymbols(qtw.QAbstractSpinBox.ButtonSymbols.NoButtons)
     max_threshold.setAlignment(Qt.AlignRight)
@@ -183,6 +183,7 @@ def load_gui_elements(parent: qtw.QWidget):
     active_excitation = qtw.QComboBox(parent)
     for x in Model372.MeasurementInputCurrentRange:
         active_excitation.addItem(range_text_converter(x.name), x)
+    active_excitation.setCurrentIndex(16)                    # MeasurementInputCurrentRange.RANGE_100_MICRO_AMPS
     layout.addRow("Active Excitation:", active_excitation)
     form["active"] = active_excitation
 

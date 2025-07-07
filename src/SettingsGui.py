@@ -143,7 +143,7 @@ class SettingsGui(qtw.QWidget):
         channel.setCurrentIndex(index)
         form_layout.addRow(channel)
         channel_form["channel"] = channel
-        channel_form["prev_channel"] = channel.currentIndex()
+        channel_form["prev_channel"] = -1
 
         calibration = qtw.QComboBox(parent)
         for key in TemperatureCalibration.functions.keys():
@@ -154,18 +154,10 @@ class SettingsGui(qtw.QWidget):
         excitation_mode = qtw.QComboBox(parent)
         excitation_mode.addItem("current", Model372.SensorExcitationMode.CURRENT)
         excitation_mode.addItem("voltage", Model372.SensorExcitationMode.VOLTAGE)
-        if channel.currentIndex() == 0:
-            excitation_mode.setDisabled(True)
         form_layout.addRow("Excitation Mode:", excitation_mode)
         channel_form["excitation_mode"] = excitation_mode
 
         excitation_range = qtw.QComboBox(parent)
-        if channel.currentIndex() == 0:
-            for x in Model372.ControlInputCurrentRange:
-                excitation_range.addItem(range_text_converter(x.name), x)
-        else:
-            for x in Model372.MeasurementInputCurrentRange:
-                excitation_range.addItem(range_text_converter(x.name), x)
         form_layout.addRow("Excitation Range:", excitation_range)
         channel_form["excitation_range"] = excitation_range
 
@@ -186,21 +178,15 @@ class SettingsGui(qtw.QWidget):
         form_layout.addRow("Units:", units)
         channel_form["units"] = units
 
-        # TODO: disable/hide for channel A
         resistance_range = qtw.QComboBox(parent)
         for x in Model372.MeasurementInputResistance:
             resistance_range.addItem(range_text_converter(x.name), x)
+        resistance_range.setCurrentIndex(9)                                 # MeasurementInputResistance.RANGE_63_POINT_2_KIL_OHMS
         form_layout.addRow("Resistance Range:", resistance_range)
         channel_form["resistance_range"] = resistance_range
 
         channel_form["readings"] = self.load_wanted_readings_checkboxes(form_layout,
                                                                         ["kelvin", "resistance", "power", "quadrature"])
-
-        quadrature_boxes = channel_form["readings"][3]
-        if channel.currentIndex() == 0:
-            quadrature_boxes["log"].setEnabled(False)
-            quadrature_boxes["plot"].setEnabled(False)
-            quadrature_boxes["custom_name"].setEnabled(False)
 
         functionality = qtw.QComboBox(parent)
         functionality.addItem("Basic", "Basic")
@@ -210,7 +196,6 @@ class SettingsGui(qtw.QWidget):
 
         channel_form["functionality_form"] = {"old_value": functionality.currentData()}
         for key in FunctionalityFunctions.functions:
-            print("load gui elemnesnfse")
             channel_form["functionality_form"][key] = FunctionalityFunctions.functions[key]["load"](parent)
             for item in channel_form["functionality_form"][key].items():
                 item[1].setVisible(False)
@@ -228,12 +213,14 @@ class SettingsGui(qtw.QWidget):
                 else:
                     excitation_mode.setCurrentIndex(0)
                 excitation_mode.setDisabled(True)
-            elif value != 0 and channel_form["prev_channel"] == 0:
+                resistance_range.setDisabled(True)
+            elif value != 0 and channel_form["prev_channel"] < 1:
                 quad_boxes["log"].setEnabled(True)
                 quad_boxes["plot"].setEnabled(True)
                 quad_boxes["custom_name"].setEnabled(True)
                 excitation_mode.setDisabled(False)
                 on_excitation_mode_changed()
+                resistance_range.setDisabled(False)
 
             channel_form["prev_channel"] = value
 
@@ -246,10 +233,12 @@ class SettingsGui(qtw.QWidget):
                 if channel.currentIndex() == 0:
                     for x in Model372.ControlInputCurrentRange:
                         excitation_range.addItem(range_text_converter(x.name), x)
+                    excitation_range.setCurrentIndex(1)                     # ControlInputCurrentRange.RANGE_1_NANO_AMP
                 else:
                     for x in Model372.MeasurementInputCurrentRange:
                         excitation_range.addItem(range_text_converter(x.name), x)
-            else:  # voltage
+                    excitation_range.setCurrentIndex(16)                    # MeasurementInputCurrentRange.RANGE_100_MICRO_AMPS
+            else:  # voltage TODO: sensible default value
                 for x in Model372.MeasurementInputVoltageRange:
                     excitation_range.addItem(range_text_converter(x.name), x)
 
@@ -274,6 +263,10 @@ class SettingsGui(qtw.QWidget):
             parent.parentWidget().setFixedHeight(parent.parentWidget().sizeHint().height())
 
         functionality.currentIndexChanged.connect(on_functionality_changed)
+
+        # initialize gui elements:
+        on_channel_changed(channel.currentIndex())
+
 
     def load_wanted_readings_checkboxes(self, form_layout: qtw.QFormLayout, readings: list[str]) -> list[dict]:
         form_layout.addRow(qtw.QLabel("Select Wanted Readings:"))
