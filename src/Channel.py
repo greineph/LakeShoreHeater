@@ -1,3 +1,5 @@
+import time
+
 from Device import Device
 from lakeshore import Model372, Model372InputSetupSettings
 import InputData
@@ -7,6 +9,8 @@ from src.AbstractFunctionality import AbstractFunctionality
 
 class Channel:
 
+    SCANNER_SETTLE_TIME = 3
+
     # TODO: maybe use Device class to get device instead of parameter
     def __init__(self, device: Model372, input_channel: Model372.InputChannel):
         self.device = device
@@ -15,11 +19,14 @@ class Channel:
         self.wanted_reading_names = []
         self.wanted_plotting_names = []
         self.calibration = "None"
-        # self.set_filter()
         self.functionality = None
 
-    # returns readings of {kelvin, resistance, power} as dictionary
+    # returns readings of {kelvin, resistance, power, quadrature(optional)} as dictionary
     def get_readings(self):
+        if self.input_channel != Model372.InputChannel.CONTROL and self.device.get_scanner_status() != self.input_channel:
+            self.device.set_scanner_status(self.input_channel.value, False)
+            time.sleep(Channel.SCANNER_SETTLE_TIME)
+
         return self.device.get_all_input_readings(self.input_channel.value)
 
     # configures channels setup settings in lakeshore device
@@ -31,19 +38,8 @@ class Channel:
     def get_setup_settings(self) -> Model372InputSetupSettings:
         return self.device.get_input_setup_parameters(self.input_channel.value)
 
-    # TODO: make this use settings selected in gui
-    # sets the measurement filter for this channel
-    def set_filter(self):
-        self.device.set_filter(input_channel=self.input_channel.value,
-                               state=InputData.STATE_FILTER,
-                               settle_time=InputData.SETTLE_TIME_FILTER,
-                               window=InputData.WINDOW_FILTER)
-
-    # [deprecated] kinda
-    # gets the selected readings from InputData
-    # @abstract
     def get_wanted_reading_keys(self) -> list[str]:
-        raise NotImplementedError("Implement this method in subclass")
+        return self.wanted_reading_keys
 
     # TODO: override kelvin when calibration is selected
     def get_wanted_readings(self) -> list:

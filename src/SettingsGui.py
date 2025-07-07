@@ -17,6 +17,8 @@ import FunctionalityFunctions
 from UliEngineering.Electronics.Resistors import resistor_tolerance
 from lakeshore import Model372
 
+from src.Device import Device
+
 
 class SettingsGui(qtw.QWidget):
 
@@ -26,7 +28,7 @@ class SettingsGui(qtw.QWidget):
         self.controller = controller
 
         self.channel_forms = []
-        self.lakeshore_form = []
+        self.lakeshore_form = {}
         self.mpv_form = {}
         self.logging_form = {}
 
@@ -323,7 +325,7 @@ class SettingsGui(qtw.QWidget):
         lakeshore_form = {}
 
         ip_address = qtw.QLineEdit(parent)
-        ip_address.setInputMask("000.000.0.00;0")
+        ip_address.setInputMask("000.000.0.00;_")
         ip_address.setText("192.168.0.12")
         ip_address.setAlignment(Qt.AlignCenter)
         ip_address.setMaximumWidth(190)
@@ -334,7 +336,7 @@ class SettingsGui(qtw.QWidget):
         filter = qtw.QCheckBox(parent)
         filter.setChecked(True)
         form_layout.addRow("use filter: ", filter)
-        lakeshore_form["filter"] = filter
+        lakeshore_form["state"] = filter
 
         settle_time = qtw.QSpinBox(parent)
         settle_time.setRange(1, 200)
@@ -411,6 +413,11 @@ class SettingsGui(qtw.QWidget):
             self.controller.append_to_file = False
         self.controller.save_path = save_path
 
+        self.controller.configure_lakeshore(ip=GuiHelper.get_data_from_widget(self.lakeshore_form["ip"]),
+                                            state=GuiHelper.get_data_from_widget(self.lakeshore_form["state"]),
+                                            settle_time=GuiHelper.get_data_from_widget(self.lakeshore_form["settle_time"]),
+                                            window=GuiHelper.get_data_from_widget(self.lakeshore_form["window"]))
+
         for channel_form in self.channel_forms:
             readings = []
             for reading in channel_form["readings"]:
@@ -442,6 +449,8 @@ class SettingsGui(qtw.QWidget):
 
             self.controller.create_channel(channel_settings, functionality)
             # print(channel_settings.create_channel(Device.get_device()))
+
+
 
         mpv_readings = []
         for reading in self.mpv_form["readings"]:
