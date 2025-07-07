@@ -26,6 +26,7 @@ class SettingsGui(qtw.QWidget):
         self.controller = controller
 
         self.channel_forms = []
+        self.lakeshore_form = []
         self.mpv_form = {}
         self.logging_form = {}
 
@@ -70,6 +71,10 @@ class SettingsGui(qtw.QWidget):
         form_holder4 = qtw.QWidget()
         form_holder_holder.layout().addWidget(form_holder4)
         self.load_logging_settings_form(form_holder4)
+
+        form_holder5 = qtw.QWidget()
+        form_holder_holder.layout().addWidget(form_holder5)
+        self.load_lakeshore_settings_form(form_holder5)
 
         scroll = qtw.QScrollArea()
         scroll.setWidget(form_holder_holder)
@@ -128,7 +133,7 @@ class SettingsGui(qtw.QWidget):
         form_layout = qtw.QFormLayout()
         parent.setLayout(form_layout)
 
-        title = qtw.QLabel("Lakeshore Settings")
+        title = qtw.QLabel("Channel Settings")
         form_layout.addRow(title)
 
         channel_form = {}
@@ -307,6 +312,52 @@ class SettingsGui(qtw.QWidget):
                 lambda s=box_reading.isChecked(), b=box_plot, n=custom_name: on_change(s, b, n))
 
         return rows
+
+    def load_lakeshore_settings_form(self, parent):
+        form_layout = qtw.QFormLayout()
+        parent.setLayout(form_layout)
+
+        title = qtw.QLabel("Lakeshore Settings")
+        form_layout.addRow(title)
+
+        lakeshore_form = {}
+
+        ip_address = qtw.QLineEdit(parent)
+        ip_address.setInputMask("000.000.0.00;0")
+        ip_address.setText("192.168.0.12")
+        ip_address.setAlignment(Qt.AlignCenter)
+        ip_address.setMaximumWidth(190)
+
+        form_layout.addRow("ip: ", ip_address)
+        lakeshore_form["ip"] = ip_address
+
+        filter = qtw.QCheckBox(parent)
+        filter.setChecked(True)
+        form_layout.addRow("use filter: ", filter)
+        lakeshore_form["filter"] = filter
+
+        settle_time = qtw.QSpinBox(parent)
+        settle_time.setRange(1, 200)
+        settle_time.setValue(5)
+        settle_time.setSuffix("s")
+        settle_time.setButtonSymbols(qtw.QAbstractSpinBox.ButtonSymbols.NoButtons)
+        settle_time.setAlignment(Qt.AlignRight)
+        form_layout.addRow("settle time: ", settle_time)
+        lakeshore_form["settle_time"] = settle_time
+
+        window = qtw.QSpinBox(parent)
+        window.setRange(1, 80)
+        window.setValue(10)
+        window.setSuffix("%")
+        window.setButtonSymbols(qtw.QAbstractSpinBox.ButtonSymbols.NoButtons)
+        window.setAlignment(Qt.AlignRight)
+        form_layout.addRow("window: ", window)
+        lakeshore_form["window"] = window
+
+        self.lakeshore_form = lakeshore_form
+
+
+
 
     def load_mpv_settings_form(self, parent):
         form_layout = qtw.QFormLayout()
