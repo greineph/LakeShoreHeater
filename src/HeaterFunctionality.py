@@ -79,7 +79,7 @@ class HeaterFunctionality(AbstractFunctionality):
         self.recent_values.append(value)
         if len(self.recent_values) > self.number_of_values:
             self.recent_values.remove(self.recent_values[0])
-        print(f"recent vals: {self.recent_values}")
+        # print(f"recent vals: {self.recent_values}")
 
     # activates the heater of associated channel by changing excitation range
     def activate_heater(self):
@@ -113,7 +113,6 @@ class HeaterFunctionality(AbstractFunctionality):
 
 
 def load_gui_elements(parent: qtw.QWidget):
-    print("loading elements")
     layout = parent.layout()
     form = {}
     if not isinstance(layout, qtw.QFormLayout):
@@ -172,7 +171,7 @@ def load_gui_elements(parent: qtw.QWidget):
     form["deviation"] = deviation
 
     max_threshold = qtw.QSpinBox()
-    max_threshold.setRange(0, 10000)
+    max_threshold.setRange(0, 200000)
     max_threshold.setValue(50000)
     max_threshold.setSuffix(" Oe")
     max_threshold.setButtonSymbols(qtw.QAbstractSpinBox.ButtonSymbols.NoButtons)
