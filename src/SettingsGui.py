@@ -478,6 +478,7 @@ class SettingsGui(qtw.QWidget):
             return
 
         settings = {"channels": [],
+                    "lakeshore": None,
                     "mpv": None,
                     "logging": None}
 
@@ -506,6 +507,11 @@ class SettingsGui(qtw.QWidget):
                                          "functionality": channel_form["functionality"].currentIndex(),
                                          "functionality_form": func_form})
 
+        lakeshore_form = {}
+        for item in self.lakeshore_form.items():
+            lakeshore_form[item[0]] = GuiHelper.get_save_data_from_widget(item[1])
+        settings["lakeshore"] = lakeshore_form
+
         mpv_readings = []
         for reading in self.mpv_form["readings"]:
             mpv_readings.append({"reading": reading["reading"],
@@ -521,6 +527,8 @@ class SettingsGui(qtw.QWidget):
             s = json.dumps(settings, indent=4)
             file.write(s)
 
+    # TODO: make import less error prone
+    # TODO: make import more iterable through use of GuiHelper functions
     def import_settings(self):
         print("loading settings")
         default_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "settings", "default.json"))
@@ -556,6 +564,10 @@ class SettingsGui(qtw.QWidget):
                 GuiHelper.get_data_from_widget(channel_form["functionality"])]
             for item in func_settings.items():
                 GuiHelper.change_widget_with_data(func_form[item[0]], item[1])
+
+        if settings.get("lakeshore"):
+            for item in settings.get("lakeshore").items():
+                GuiHelper.change_widget_with_data(self.lakeshore_form[item[0]], item[1])
 
         mpv_form = self.mpv_form
         mpv_settings = settings["mpv"]
