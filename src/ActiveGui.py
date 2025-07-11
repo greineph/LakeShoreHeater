@@ -8,6 +8,7 @@ from PyQt5.QtWidgets import QSizePolicy
 import sys
 
 from src import GuiHelper
+from src.SettingsGui import SettingsGui
 
 
 class ActiveGui(qtw.QWidget):
@@ -15,6 +16,7 @@ class ActiveGui(qtw.QWidget):
     def __init__(self, controller):
         super().__init__()
         self.controller = controller
+        self.paused = False
 
         self.setGeometry(100, 100, 400, 0)
         # self.setWindowState(Qt.WindowMaximized)
@@ -23,38 +25,54 @@ class ActiveGui(qtw.QWidget):
         self.setWindowIcon(qtg.QIcon(path))
 
         self.setLayout(qtw.QVBoxLayout())
-        # self.layout().setContentsMargins(0, 0, 0, 0)
+        self.layout().setContentsMargins(0, 0, 0, 0)
 
         self.setFont(qtg.QFont("Bahnschrift", 16))
         self.setStyleSheet(" QToolTip{ font: 16pt }")
         self.setToolTipDuration(0)
 
+        tabs = qtw.QTabWidget()
+        tabs.setLayout(qtw.QVBoxLayout())
+        self.layout().addWidget(tabs)
+
+        main_tab = qtw.QWidget()
+        self.load_main_tab(main_tab)
+        tabs.addTab(main_tab, "Tab 1")
+
+        settings_tab = qtw.QWidget()
+        tabs.addTab(settings_tab, "Settings")
+
+        self.show()
+
+    def load_main_tab(self, parent: qtw.QWidget):
+        layout = qtw.QVBoxLayout()
+        parent.setLayout(layout)
+        parent.setFont(qtg.QFont("Bahnschrift", 16))
+
         # possibly unnecessary
-        pause_unpause = qtw.QPushButton(self)
+        pause_unpause = qtw.QPushButton(parent)
         pause_unpause.setText("Pause")
         self.paused = False
-        self.layout().addWidget(pause_unpause)
+        layout.addWidget(pause_unpause)
 
         def pause_unpause_logging():
             if self.paused:
                 self.paused = False
                 pause_unpause.setText("Pause")
-                controller.unpause_logging()
+                self.controller.unpause_logging()
             else:
                 self.paused = True
                 pause_unpause.setText("Unpause")
-                controller.pause_logging()
+                self.controller.pause_logging()
 
         pause_unpause.clicked.connect(pause_unpause_logging)
 
-        stop = qtw.QPushButton(self)
+        stop = qtw.QPushButton(parent)
         stop.setText("Stop")
-        self.layout().addWidget(stop)
-
-        self.show()
+        layout.addWidget(stop)
 
 
-def show_gui(controller=None):
+def show_gui(controller):
     app = qtw.QApplication(sys.argv)
     gui = ActiveGui(controller)
     app.exec_()
@@ -62,4 +80,4 @@ def show_gui(controller=None):
 
 # just for testing ui
 if __name__ == "__main__":
-    show_gui()
+    show_gui(None)

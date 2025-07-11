@@ -22,7 +22,7 @@ from src.Device import Device
 
 class SettingsGui(qtw.QWidget):
 
-    def __init__(self, controller=None):
+    def __init__(self, controller):
         super().__init__()
 
         self.controller = controller
@@ -95,39 +95,6 @@ class SettingsGui(qtw.QWidget):
         import_btn = qtw.QPushButton("Import")
         import_btn.clicked.connect(self.import_settings)
         self.layout().addWidget(import_btn)
-
-        # entry = qtw.QLineEdit("default")
-        # entry.setObjectName("name_field")
-        # self.layout().addWidget(entry)
-        #
-        # combo_box = qtw.QComboBox()
-        # combo_box.addItem("Channel A", 0)
-        # for i in range(1, 17):
-        #     combo_box.addItem(f"Channel {i}", i)
-        # self.layout().addWidget(combo_box)
-        #
-        # spin_box = qtw.QDoubleSpinBox(self)
-        # spin_box.setValue(10)
-        # spin_box.setRange(0, 100)
-        # spin_box.setSingleStep(7.5)
-        # spin_box.setSuffix("$")
-        # self.layout().addWidget(spin_box)
-        #
-        # text_box = qtw.QTextEdit(self)
-        # text_box.setLineWrapMode(qtw.QTextEdit.LineWrapMode.FixedColumnWidth)
-        # text_box.setAcceptRichText(True)
-        # text_box.setLineWrapColumnOrWidth(-1)
-        # text_box.setPlaceholderText("holder text hello")
-        # text_box.setReadOnly(False)
-        # text_box.setHtml("<h1><b>Some text!!</b></h1>")
-        # self.layout().addWidget(text_box)
-
-        # formLayout is cool
-
-        # b1 = qtw.QPushButton("Click me")
-        # b1.clicked.connect(lambda: __clicked__(label, f"{combo_box.currentText()} is {spin_box.value()}\n"
-        #                                               f"{text_box.toPlainText()}", text_box))
-        # self.layout().addWidget(b1)
 
         self.show()
 
@@ -581,7 +548,7 @@ class SettingsGui(qtw.QWidget):
         self.logging_form["interval"].setValue(settings["logging"]["interval"])
 
 
-def show_gui(controller=None):
+def show_gui(controller):
     app = qtw.QApplication(sys.argv)
     gui = SettingsGui(controller)
     app.exec_()
@@ -590,4 +557,4 @@ def show_gui(controller=None):
 # just for testing ui
 if __name__ == "__main__":
     # t = Thread(target=show_gui())
-    show_gui()
+    show_gui(None)
