@@ -1,6 +1,7 @@
 import os
 import time
 from datetime import datetime
+from multiprocessing import Queue
 
 import pandas as pd
 
@@ -31,6 +32,7 @@ class Datahub:
 
         self.reader = None
         self.graph = None
+        self.queue = Queue()
         self.instruction_queue = []
         self.controller = controller
 
@@ -50,7 +52,8 @@ class Datahub:
             plotting_names += ch.wanted_plotting_names
         if self.mpv_wrapper:
             plotting_names += self.mpv_wrapper.wanted_plotting_names
-        self.graph = LiveGraph(datahub=self,
+        self.graph = LiveGraph(queue=self.queue,
+                               df=self.df,
                                x_axis="timedelta",
                                y_axis=plotting_names)
         if not self.append_to_file:
@@ -59,11 +62,8 @@ class Datahub:
         print("starting reader")
         self.reader.start()
         print("reader started")
-        self.graph.initialize()
-
-        while True:
-            time.sleep(0.1)
-            self.graph.update()
+        self.graph.start()
+        print("graph started")
 
     def pause_logging(self):
         self.instruction_queue.append(Instructions.PAUSE)
@@ -73,6 +73,7 @@ class Datahub:
 
     # appends {data} to self.df
     def update(self, data):
+        self.queue.put(data)
         self.df.loc[len(self.df)] = data
         with open(self.save_path, "a") as file:
             file.write(",".join([str(i) for i in data]) + "\n")

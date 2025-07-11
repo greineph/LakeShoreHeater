@@ -33,18 +33,13 @@ class Controller:
         self.provide_dependencies()
 
     # starts the process
-    # TODO: set_scanner_status to relevant channel
     def start(self):
         if not self.ready:
             return
 
         print("starting process")
         self.datahub.start_logging(self.logging_interval)
-        # try:
-        #     self.datahub.start_logging(self.logging_interval)
-        # except:
-        #     print("something went wrong")
-        #     self.datahub.write_csv(name="emergency_out")
+        ActiveGui.show_gui()
 
     def pause_logging(self):
         self.datahub.pause_logging()
@@ -57,7 +52,6 @@ class Controller:
         channel.add_functionality(functionality)
         self.channels.append(channel)
 
-    # could make this apply to all channels and include ip for better readability but worse performance
     def configure_lakeshore(self, ip, state, settle_time, window):
         Device.ip_address = ip
         print("setting filter")
@@ -70,11 +64,5 @@ class Controller:
     def provide_dependencies(self):
         for ch in self.channels:
             ch.functionality.provide_dependencies(self)
-
-    def show_active_gui(self):
-        gui_thread = Thread(target=ActiveGui.show_gui, args=[self], daemon=True)
-        gui_thread.start()
-        print("gui started")
-
 
     # TODO: behaviour for stopping/exiting

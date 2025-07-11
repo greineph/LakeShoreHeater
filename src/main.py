@@ -1,8 +1,9 @@
 from Controller import Controller
 
-### starts the program ###
+# -- starts the program -- #
 
-controller = Controller()
-controller.start()
+if __name__ == "__main__":
+    controller = Controller()
+    controller.start()
 
-#TODO: Requirements file for ve
+# TODO: Requirements file for ve

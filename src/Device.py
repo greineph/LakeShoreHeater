@@ -8,7 +8,7 @@ import InputData
 class Device:
     device = None
     ip_address = "192.168.0.12"
-    DEBUG_MODE = False
+    DEBUG_MODE = True
 
     @staticmethod
     def get_device() -> Model372:

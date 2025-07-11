@@ -9,6 +9,7 @@ import sys
 
 from src import GuiHelper
 
+
 class ActiveGui(qtw.QWidget):
 
     def __init__(self, controller):
@@ -49,7 +50,6 @@ class ActiveGui(qtw.QWidget):
         stop = qtw.QPushButton(self)
         stop.setText("Stop")
         self.layout().addWidget(stop)
-
 
         self.show()
 

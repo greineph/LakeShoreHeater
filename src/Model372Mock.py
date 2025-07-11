@@ -36,3 +36,11 @@ class Model372Mock(Model372):
     def set_filter(self, input_channel, state, settle_time, window):
         pass
 
+    def get_filter(self, input_channel):
+        return {}
+
+    def set_scanner_status(self, input_channel, status):
+        pass
+
+    def get_scanner_status(self):
+        return Model372.InputChannel.ONE

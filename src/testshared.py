@@ -1,17 +1,36 @@
 import multiprocessing
 import threading
 import time
+import multiprocessing as mp
+
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 from matplotlib import style
 import random
 import pandas as pd
 import tkinter as tk
+import ActiveGui
 
 
-class Graph:
+class Graph(mp.Process):
 
-    def __init__(self):
+    def __init__(self, queue: mp.Queue):
+        super().__init__()
+        self.change_limits = None
+        self.ln = None
+        self.ax = None
+        self.fig = None
+        self.df = None
+        self.queue = queue
+
+    def run(self):
+        print(self.queue)
+        self.initialize()
+        while True:
+            self.update()
+            self.check_queue()
+
+    def initialize(self):
         style.use("seaborn-v0_8-whitegrid")
         self.df = pd.DataFrame({"c1": [i for i in range(5)],
                                 "c2": [random.uniform(0, 90) for i in range(5)]})
@@ -21,18 +40,17 @@ class Graph:
         self.ln, = self.ax.plot(self.df["c1"], self.df["c2"])
         plt.ylim(0, 100)
         plt.pause(0.1)
-        self.has_new_data = False
         self.change_limits = True
-        # self.ani = animation.FuncAnimation(self.fig, self.update, interval=1000)
 
     def new_data(self, data):
-        # print(f"received new data {data}")
+        print(f"received new data {data}")
         self.df.loc[len(self.df)] = [len(self.df), data]
-        self.has_new_data = True
 
-    def update(self, i):
-        if self.has_new_data:
-            self.has_new_data = False
+    def check_queue(self):
+        while not self.queue.empty():
+            self.new_data(self.queue.get())
+
+    def update(self):
         # print(f"updating {self.df}")
         x_vals = self.df["c1"].tolist()
         y_vals = self.df["c2"].tolist()
@@ -47,22 +65,19 @@ class Graph:
 
 class Reader(threading.Thread):
 
-    def __init__(self, graph):
+    def __init__(self, queue: mp.Queue):
         super().__init__()
-        self.graph = graph
+        self.queue = queue
         self.last = 45.0
 
     def run(self):
         print("thread started")
         while True:
             self.last = min(90.0, max(0.0, self.last + random.uniform(-2, 2)))
-            self.graph.new_data(self.last)
+            self.queue.put(self.last)
+            print("new reading")
             # print("hi Im a thread")
-            # time.sleep(0.001)
-
-
-def update():
-    print("hi gui")
+            time.sleep(0.1)
 
 
 class Gui(threading.Thread):
@@ -92,15 +107,16 @@ class Gui(threading.Thread):
 
 
 if __name__ == "__main__":
-    g = Graph()
-    r = Reader(g)
+    queue = mp.Queue()
+    g = Graph(queue)
+    g.daemon = True
+    g.start()
+    r = Reader(queue)
     r.start()
-    gui = Gui(g)
-    gui.start()
-
+    # ActiveGui.show_gui()
+    print("gui started")
     while True:
-        g.update(1)
-        time.sleep(0.01)
+        time.sleep(1)
 
 
 
