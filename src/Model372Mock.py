@@ -31,7 +31,7 @@ class Model372Mock(Model372):
         pass
 
     def get_input_setup_parameters(self, input_channel):
-        return Model372InputSetupSettings(0, 0, 0, False, 0, 0)
+        return Model372InputSetupSettings(1, 2, 1, True, 1, 3)
 
     def set_filter(self, input_channel, state, settle_time, window):
         pass

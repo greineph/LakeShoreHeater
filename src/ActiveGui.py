@@ -7,7 +7,11 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QSizePolicy
 import sys
 
-from src import GuiHelper
+from lakeshore import Model372
+
+from src import GuiHelper, FunctionalityFunctions
+from src.Device import Device
+from src.InputData import range_text_converter
 from src.SettingsGui import SettingsGui
 
 
@@ -40,7 +44,10 @@ class ActiveGui(qtw.QWidget):
         tabs.addTab(main_tab, "Tab 1")
 
         settings_tab = qtw.QWidget()
+        self.load_channel_settings_form(settings_tab)
         tabs.addTab(settings_tab, "Settings")
+
+        tabs.setCurrentIndex(1)
 
         self.show()
 
@@ -70,6 +77,116 @@ class ActiveGui(qtw.QWidget):
         stop = qtw.QPushButton(parent)
         stop.setText("Stop")
         layout.addWidget(stop)
+
+    # TODO: test type of variables in InputSetupSettings
+    def load_channel_settings_form(self, parent, index=0):
+        form_layout = qtw.QFormLayout()
+        parent.setLayout(form_layout)
+        parent.setFont(qtg.QFont("Bahnschrift", 16))
+
+        title = qtw.QLabel(f"Channel {'A' if index == 0 else index}:")
+        form_layout.addRow(title)
+
+        channel_form = {}
+        channel_settings = Device.get_device().get_input_setup_parameters(index)
+        print(channel_settings)
+
+        mode = qtw.QComboBox(parent)
+        mode.addItem("voltage", Model372.SensorExcitationMode.VOLTAGE)
+        mode.addItem("current", Model372.SensorExcitationMode.CURRENT)
+        mode.setCurrentIndex(channel_settings.mode)
+        form_layout.addRow("Excitation Mode:", mode)
+        channel_form["excitation_mode"] = mode
+
+        excitation_range = qtw.QComboBox(parent)
+        form_layout.addRow("Excitation Range:", excitation_range)
+        channel_form["excitation_range"] = excitation_range
+
+        auto_range = qtw.QComboBox(parent)
+        auto_range.addItem("Off", Model372.AutoRangeMode.OFF)
+        auto_range.addItem("On", Model372.AutoRangeMode.CURRENT)
+        auto_range.setCurrentIndex(channel_settings.auto_range)
+        form_layout.addRow("Auto Range:", auto_range)
+        channel_form["auto_range"] = auto_range
+
+        shunted = qtw.QCheckBox(parent)
+        shunted.setStyleSheet("QCheckBox::indicator { width:20px; height: 20px;}")
+        shunted.setChecked(channel_settings.current_source_shunted)
+        form_layout.addRow("Shunted:", shunted)
+        channel_form["shunted"] = shunted
+
+        units = qtw.QComboBox(parent)
+        units.addItem("Kelvin", Model372.InputSensorUnits.KELVIN)
+        units.addItem("Ohms", Model372.InputSensorUnits.OHMS)
+        # TODO: check if units enum has values [0, 1] or [1, 2]
+        units.setCurrentIndex(channel_settings.units - 1) # -1 because for no reason the enum starts at 1 and not 0 :|
+        form_layout.addRow("Units:", units)
+        channel_form["units"] = units
+
+        resistance_range = qtw.QComboBox(parent)
+        for x in Model372.MeasurementInputResistance:
+            resistance_range.addItem(range_text_converter(x.name), x)
+        resistance_range.setCurrentIndex(channel_settings.resistance_range)                                 # MeasurementInputResistance.RANGE_63_POINT_2_KIL_OHMS
+        form_layout.addRow("Resistance Range:", resistance_range)
+        channel_form["resistance_range"] = resistance_range
+
+        # channel_form["readings"] = self.load_wanted_readings_checkboxes(form_layout,
+        #                                                                 ["kelvin", "resistance", "power", "quadrature"])
+
+        functionality = qtw.QComboBox(parent)
+        functionality.addItem("Basic", "Basic")
+        functionality.addItem("Heater", "Heater")
+        form_layout.addRow(functionality)
+        channel_form["functionality"] = functionality
+
+        channel_form["functionality_form"] = {"old_value": functionality.currentData()}
+        for key in FunctionalityFunctions.functions:
+            channel_form["functionality_form"][key] = FunctionalityFunctions.functions[key]["load"](parent)
+            for item in channel_form["functionality_form"][key].items():
+                item[1].setVisible(False)
+                form_layout.labelForField(item[1]).setVisible(False)
+
+        def on_channel_changed(value):
+            quad_boxes = channel_form["readings"][3]
+            print(f"old: {channel_form['prev_channel']}, new: {value}")
+            if value == 0 and channel_form["prev_channel"] != 0:
+                quad_boxes["log"].setEnabled(False)
+                quad_boxes["plot"].setEnabled(False)
+                quad_boxes["custom_name"].setEnabled(False)
+                if mode.currentIndex() == 0:
+                    on_excitation_mode_changed()
+                else:
+                    mode.setCurrentIndex(0)
+                mode.setDisabled(True)
+                resistance_range.setDisabled(True)
+            elif value != 0 and channel_form["prev_channel"] < 1:
+                quad_boxes["log"].setEnabled(True)
+                quad_boxes["plot"].setEnabled(True)
+                quad_boxes["custom_name"].setEnabled(True)
+                mode.setDisabled(False)
+                on_excitation_mode_changed()
+                resistance_range.setDisabled(False)
+
+        def on_excitation_mode_changed(value):
+            excitation_range.clear()
+            print("changed ex mode")
+            if value == Model372.SensorExcitationMode.CURRENT.value:
+                if index == Model372.InputChannel.CONTROL.value:
+                    for x in Model372.ControlInputCurrentRange:
+                        excitation_range.addItem(range_text_converter(x.name), x)
+                    excitation_range.setCurrentIndex(1)                     # ControlInputCurrentRange.RANGE_1_NANO_AMP
+                else:
+                    for x in Model372.MeasurementInputCurrentRange:
+                        excitation_range.addItem(range_text_converter(x.name), x)
+                    excitation_range.setCurrentIndex(16)                    # MeasurementInputCurrentRange.RANGE_100_MICRO_AMPS
+            else:  # voltage TODO: sensible default value
+                for x in Model372.MeasurementInputVoltageRange:
+                    excitation_range.addItem(range_text_converter(x.name), x)
+
+        mode.currentIndexChanged.connect(on_excitation_mode_changed)
+
+        on_excitation_mode_changed(mode.currentData().value)
+        excitation_range.setCurrentIndex(channel_settings.excitation_range)
 
 
 def show_gui(controller):
