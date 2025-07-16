@@ -28,18 +28,22 @@ class Model372Mock(Model372):
                 "quadrature": Model372Mock.QUADRATURE}
 
     def configure_input(self, input_channel, settings):
+        print("configuring input")
+        print(f"channel {input_channel},\n{vars(settings)}")
         pass
 
     def get_input_setup_parameters(self, input_channel):
         return Model372InputSetupSettings(1, 2, 1, True, 1, 3)
 
     def set_filter(self, input_channel, state, settle_time, window):
+        print("setting filter")
         pass
 
     def get_filter(self, input_channel):
         return {}
 
     def set_scanner_status(self, input_channel, status):
+        print("settings scanner")
         pass
 
     def get_scanner_status(self):

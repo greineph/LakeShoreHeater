@@ -39,7 +39,7 @@ class Controller:
 
         print("starting process")
         self.datahub.start_logging(self.logging_interval)
-        ActiveGui.show_gui()
+        ActiveGui.show_gui(self)
 
     def pause_logging(self):
         self.datahub.pause_logging()
