@@ -111,6 +111,37 @@ class HeaterFunctionality(AbstractFunctionality):
         self.mpv_wrapper = controller.mpv_wrapper
         print(controller.mpv_wrapper)
 
+    def change_settings(self, settings):
+        self.use_threshold = settings["threshold"]
+        self.activation_threshold = settings["activation"]
+        self.deactivation_threshold = settings["deactivation"]
+        self.use_stability = settings["stability"]
+        self.number_of_values = settings["values"]
+        self.deviation = settings["deviation"]
+        self.max_threshold = settings["max"]
+        self.active_excitation = settings["active"]
+        self.interval = settings["interval"]
+
+    def load_active_gui(self, parent):
+        parent.setLayout(qtw.QVBoxLayout())
+        parent.setFont(qtg.QFont("Bahnschrift", 16))
+        parent.layout().addWidget(qtw.QLabel("Heater"))
+        form_holder = qtw.QWidget()
+        form_holder.setLayout(qtw.QFormLayout())
+        form = load_gui_elements(form_holder)
+        parent.layout().addWidget(form_holder)
+
+        apply_btn = qtw.QPushButton("Apply")
+        parent.layout().addWidget(apply_btn)
+
+        def apply_settings():
+            data = extract_data(form)
+            print(data)
+            self.change_settings(data)
+            print(self.use_stability)
+
+        apply_btn.clicked.connect(apply_settings)
+
 
 def load_gui_elements(parent: qtw.QWidget):
     layout = parent.layout()
@@ -140,15 +171,6 @@ def load_gui_elements(parent: qtw.QWidget):
     deactivation_threshold.setAlignment(Qt.AlignRight)
     layout.addRow("Deactivates at:", deactivation_threshold)
     form["deactivation"] = deactivation_threshold
-
-    # threshold_delta = qtw.QDoubleSpinBox()
-    # threshold_delta.setRange(0, 100)
-    # threshold_delta.setValue(2)
-    # threshold_delta.setSuffix("B")
-    # threshold_delta.setButtonSymbols(qtw.QAbstractSpinBox.ButtonSymbols.NoButtons)
-    # threshold_delta.setAlignment(Qt.AlignRight)
-    # layout.addRow("Delta:", threshold_delta)
-    # form["delta"] = threshold_delta
 
     use_stability = qtw.QCheckBox(parent)
     layout.addRow("Stability:", use_stability)
@@ -200,11 +222,9 @@ def load_gui_elements(parent: qtw.QWidget):
             use_stability.setChecked(False)
             activation_threshold.setEnabled(True)
             deactivation_threshold.setEnabled(True)
-            # threshold_delta.setEnabled(True)
         else:
             activation_threshold.setEnabled(False)
             deactivation_threshold.setEnabled(False)
-            # threshold_delta.setEnabled(False)
 
     use_threshold.stateChanged.connect(on_use_threshold_change)
 
@@ -223,7 +243,6 @@ def load_gui_elements(parent: qtw.QWidget):
     on_use_stability_change(False)
 
     return form
-
 
 def extract_data(gui_elements):
     data = {}

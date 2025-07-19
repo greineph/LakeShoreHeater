@@ -16,6 +16,9 @@ class AbstractFunctionality:
     def provide_dependencies(self, controller):
         pass
 
+    def load_active_gui(self, parent):
+        parent.hide()
+
 
 def load_gui_elements(parent):
     return {}

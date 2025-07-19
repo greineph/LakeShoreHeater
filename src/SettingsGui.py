@@ -380,6 +380,9 @@ class SettingsGui(qtw.QWidget):
             self.controller.append_to_file = False
         self.controller.save_path = save_path
 
+        if save_path == "":
+            return
+
         self.controller.configure_lakeshore(ip=GuiHelper.get_data_from_widget(self.lakeshore_form["ip"]),
                                             state=GuiHelper.get_data_from_widget(self.lakeshore_form["state"]),
                                             settle_time=GuiHelper.get_data_from_widget(self.lakeshore_form["settle_time"]),

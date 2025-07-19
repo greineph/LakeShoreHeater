@@ -10,6 +10,7 @@ import sys
 from lakeshore import Model372, Model372InputSetupSettings
 
 from src import GuiHelper, FunctionalityFunctions
+from src.AbstractFunctionality import AbstractFunctionality
 from src.Device import Device
 from src.InputData import range_text_converter
 from src.SettingsGui import SettingsGui
@@ -39,14 +40,15 @@ class ActiveGui(qtw.QWidget):
         tabs = qtw.QTabWidget()
         self.layout().addWidget(tabs)
 
+        # main tab
         main_tab = qtw.QWidget()
         self.load_main_tab(main_tab)
         tabs.addTab(main_tab, "Tab 1")
 
         settings_tab = qtw.QWidget()
         settings_tab.setLayout(qtw.QVBoxLayout())
-        # settings_tab.setFont(qtg.QFont("Bahnschrift", 16))
 
+        # channel tab
         channel_holder = qtw.QWidget()
         channel_holder.setLayout(qtw.QHBoxLayout())
         channel_holder.layout().setContentsMargins(0, 0, 0, 0)
@@ -76,7 +78,21 @@ class ActiveGui(qtw.QWidget):
         apply_btn.clicked.connect(apply_settings)
         tabs.addTab(settings_tab, "Settings")
 
-        tabs.setCurrentIndex(1)
+        # functionality tab
+        functionality_tab = qtw.QWidget()
+        functionality_tab.setLayout(qtw.QVBoxLayout())
+
+        functionality_holder = qtw.QWidget()
+        functionality_holder.setLayout(qtw.QHBoxLayout())
+        functionality_holder.layout().setContentsMargins(0, 0, 0, 0)
+        for ch in self.controller.channels:
+            settings_holder = qtw.QWidget()
+            self.load_functionality_settings_(settings_holder, ch.functionality)
+            functionality_holder.layout().addWidget(settings_holder)
+        functionality_tab.layout().addWidget(functionality_holder)
+        tabs.addTab(functionality_tab, "Functionality")
+
+        tabs.setCurrentIndex(2)
 
         self.show()
 
@@ -183,6 +199,9 @@ class ActiveGui(qtw.QWidget):
 
         on_excitation_mode_changed(mode.currentData().value)
         excitation_range.setCurrentIndex(channel_settings.excitation_range)
+
+    def load_functionality_settings_(self, parent, functionality):
+        functionality.load_active_gui(parent)
 
 
 def show_gui(controller):
