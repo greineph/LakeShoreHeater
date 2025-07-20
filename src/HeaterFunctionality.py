@@ -22,6 +22,7 @@ class HeaterFunctionality(AbstractFunctionality):
         self.mpv_wrapper = None
         self.thread = None
         self.is_running = False
+        self.automatic = True
 
         self.use_threshold = use_threshold
         self.current_value = np.nan
@@ -48,7 +49,8 @@ class HeaterFunctionality(AbstractFunctionality):
             start_time = time.monotonic()
             while heater.is_running:
                 heater.add_value(mpv_wrapper.get_field())
-                heater.update()
+                if heater.automatic:
+                    heater.update()
                 time.sleep(heater.interval - ((time.monotonic() - start_time) % heater.interval))
 
         self.thread = threading.Thread(target=run, args=(self, self.mpv_wrapper), daemon=True)
@@ -59,6 +61,7 @@ class HeaterFunctionality(AbstractFunctionality):
 
     # activates/deactivates the heater based on criteria set during initialisation
     def update(self):
+        print("heater automatic tick")
         if self.use_threshold:
             if self.current_value <= self.activation_threshold:
                 self.activate_heater()
@@ -67,8 +70,8 @@ class HeaterFunctionality(AbstractFunctionality):
 
         elif self.use_stability:
             std = np.std(self.recent_values)
-            if std < self.deviation and self.current_value < self.max_threshold and len(
-                    self.recent_values) == self.number_of_values:
+            if (std < self.deviation and self.current_value < self.max_threshold and
+                    len(self.recent_values) == self.number_of_values):
                 self.activate_heater()
             elif std > self.deviation:
                 self.deactivate_heater()
@@ -133,6 +136,32 @@ class HeaterFunctionality(AbstractFunctionality):
 
         apply_btn = qtw.QPushButton("Apply")
         parent.layout().addWidget(apply_btn)
+
+        toggle_auto = qtw.QPushButton("Set Manual")
+        parent.layout().addWidget(toggle_auto)
+
+        def toggle_heater_automation():
+            if self.automatic:
+                self.automatic = False
+                toggle_auto.setText("Set Automatic")
+            else:
+                self.automatic = True
+                toggle_auto.setText("Set Manual")
+
+        toggle_auto.clicked.connect(toggle_heater_automation)
+
+        toggle_active = qtw.QPushButton("Activate" if self.heater_active else "Deactivate")
+        parent.layout().addWidget(toggle_active)
+
+        def toggle_heater_active():
+            if self.heater_active:
+                self.deactivate_heater()
+                toggle_active.setText("Activate")
+            else:
+                self.activate_heater()
+                toggle_active.setText("Deactivate")
+
+        toggle_active.clicked.connect(toggle_heater_active)
 
         def apply_settings():
             data = extract_data(form)
