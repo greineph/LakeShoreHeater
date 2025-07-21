@@ -96,6 +96,19 @@ class ActiveGui(qtw.QWidget):
 
         self.show()
 
+    def closeEvent(self, event):
+        print("Nope :)")
+        dialog = qtw.QDialog(self)
+        dialog.setWindowTitle("No Dude")
+        # dialog.setFixedSize(200, 100)
+        dialog.setLayout(qtw.QVBoxLayout())
+        label = qtw.QLabel("No thanks :3")
+        label.setFont(qtg.QFont("Bahnschrift", 16))
+        dialog.layout().addWidget(label)
+        dialog.layout().setContentsMargins(50, 50, 50, 50)
+        dialog.exec()
+        event.ignore()
+
     def load_main_tab(self, parent: qtw.QWidget):
         layout = qtw.QVBoxLayout()
         parent.setLayout(layout)
@@ -167,13 +180,12 @@ class ActiveGui(qtw.QWidget):
         form_layout.addRow("Units:", units)
         channel_form["units"] = units
 
-        resistance_range = qtw.QComboBox(parent)
+        resistance_range = qtw.QComboBox()
         for x in Model372.MeasurementInputResistance:
             resistance_range.addItem(range_text_converter(x.name), x)
         resistance_range.setCurrentIndex(0 if index == "A" else channel_settings.resistance_range - 1)  # -1 because enum starts at 1, why?
-        form_layout.addRow("Resistance Range:", resistance_range)
-        if index == "A":
-            resistance_range.setDisabled(True)
+        if index != "A":
+            form_layout.addRow("Resistance Range:", resistance_range)
         channel_form["resistance_range"] = resistance_range
 
         def on_excitation_mode_changed(value):
