@@ -40,6 +40,10 @@ class HeaterFunctionality(AbstractFunctionality):
         self.idle_excitation = None
         self.interval = interval
 
+        # gui elements
+        self.active_display = None
+        self.toggle_active = None
+
     def start(self):
         print("start functionality of heater")
         print(self.mpv_wrapper)
@@ -61,7 +65,7 @@ class HeaterFunctionality(AbstractFunctionality):
 
     # activates/deactivates the heater based on criteria set during initialisation
     def update(self):
-        print("heater automatic tick")
+        # print("heater automatic tick")
         if self.use_threshold:
             if self.current_value <= self.activation_threshold:
                 self.activate_heater()
@@ -94,6 +98,7 @@ class HeaterFunctionality(AbstractFunctionality):
         settings.excitation_range = self.active_excitation
         self.channel.configure_setup_settings(settings)
         self.heater_active = True
+        self.update_gui_elements()
 
     # deactivates the heater of associated channel by changing excitation range
     def deactivate_heater(self):
@@ -105,6 +110,7 @@ class HeaterFunctionality(AbstractFunctionality):
         settings.excitation_range = self.idle_excitation
         self.channel.configure_setup_settings(settings)
         self.heater_active = False
+        self.update_gui_elements()
 
     def add_channel(self, channel):
         self.channel = channel
@@ -125,10 +131,25 @@ class HeaterFunctionality(AbstractFunctionality):
         self.active_excitation = settings["active"]
         self.interval = settings["interval"]
 
+    def update_gui_elements(self):
+        if self.active_display:
+            self.active_display.setText("● active" if self.heater_active else "● inactive")
+            self.active_display.setStyleSheet(f"color: {'green' if self.heater_active else 'red'}")
+
+        if self.toggle_active:
+            self.toggle_active.setText("Deactivate" if self.heater_active else "Activate")
+
     def load_active_gui(self, parent):
         parent.setLayout(qtw.QVBoxLayout())
         parent.setFont(qtg.QFont("Bahnschrift", 16))
-        parent.layout().addWidget(qtw.QLabel("Heater"))
+        title_holder = qtw.QWidget()
+        title_holder.setLayout(qtw.QHBoxLayout())
+        title_holder.layout().addWidget(qtw.QLabel("Heater"))
+        self.active_display = qtw.QLabel("● active" if self.heater_active else "● inactive")
+        self.active_display.setStyleSheet(f"color: {'green' if self.heater_active else 'red'}")
+        self.active_display.setFont(qtg.QFont("Bahnschrift", 16))
+        title_holder.layout().addWidget(self.active_display)
+        parent.layout().addWidget(title_holder)
         form_holder = qtw.QWidget()
         form_holder.setLayout(qtw.QFormLayout())
         form = load_gui_elements(form_holder)
@@ -150,18 +171,16 @@ class HeaterFunctionality(AbstractFunctionality):
 
         toggle_auto.clicked.connect(toggle_heater_automation)
 
-        toggle_active = qtw.QPushButton("Activate" if self.heater_active else "Deactivate")
-        parent.layout().addWidget(toggle_active)
+        self.toggle_active = qtw.QPushButton("Deactivate" if self.heater_active else "Activate")
+        parent.layout().addWidget(self.toggle_active)
 
         def toggle_heater_active():
             if self.heater_active:
                 self.deactivate_heater()
-                toggle_active.setText("Activate")
             else:
                 self.activate_heater()
-                toggle_active.setText("Deactivate")
 
-        toggle_active.clicked.connect(toggle_heater_active)
+        self.toggle_active.clicked.connect(toggle_heater_active)
 
         def apply_settings():
             data = extract_data(form)

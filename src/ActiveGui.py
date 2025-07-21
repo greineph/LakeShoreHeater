@@ -135,7 +135,7 @@ class ActiveGui(qtw.QWidget):
         channel_form = {"input_channel": index}
         self.channels.append(channel_form)
         channel_settings = Device.get_device().get_input_setup_parameters(index)
-        print(channel_settings)
+        print(vars(channel_settings))
 
         mode = qtw.QComboBox(parent)
         mode.addItem("voltage", Model372.SensorExcitationMode.VOLTAGE)
@@ -164,7 +164,6 @@ class ActiveGui(qtw.QWidget):
         units = qtw.QComboBox(parent)
         units.addItem("Kelvin", Model372.InputSensorUnits.KELVIN)
         units.addItem("Ohms", Model372.InputSensorUnits.OHMS)
-        # TODO: check if units enum has values [0, 1] or [1, 2]
         units.setCurrentIndex(channel_settings.units - 1)  # -1 because for no reason the enum starts at 1 and not 0 :|
         form_layout.addRow("Units:", units)
         channel_form["units"] = units
@@ -172,8 +171,7 @@ class ActiveGui(qtw.QWidget):
         resistance_range = qtw.QComboBox(parent)
         for x in Model372.MeasurementInputResistance:
             resistance_range.addItem(range_text_converter(x.name), x)
-        resistance_range.setCurrentIndex(
-            channel_settings.resistance_range)  # MeasurementInputResistance.RANGE_63_POINT_2_KIL_OHMS
+        resistance_range.setCurrentIndex(0 if index == "A" else channel_settings.resistance_range - 1)  # -1 because enum starts at 1, why?
         form_layout.addRow("Resistance Range:", resistance_range)
         if index == "A":
             resistance_range.setDisabled(True)
@@ -198,7 +196,7 @@ class ActiveGui(qtw.QWidget):
         mode.currentIndexChanged.connect(on_excitation_mode_changed)
 
         on_excitation_mode_changed(mode.currentData().value)
-        excitation_range.setCurrentIndex(channel_settings.excitation_range)
+        excitation_range.setCurrentIndex(channel_settings.excitation_range - 1)  # -1 because bad enums (they start at 1)
 
     def load_functionality_settings_(self, parent, functionality):
         functionality.load_active_gui(parent)
