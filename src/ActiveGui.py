@@ -123,7 +123,6 @@ class ActiveGui(qtw.QWidget):
         stop.setText("Stop")
         layout.addWidget(stop)
 
-    # TODO: test type of variables in InputSetupSettings
     def load_channel_settings_form(self, parent, index):
         form_layout = qtw.QFormLayout()
         parent.setLayout(form_layout)
