@@ -18,11 +18,12 @@ class LiveGraph(Process):
         self.y_axis = y_axis
         self.fig = None
         self.lines: list[plt.Line2D] = []
-        self.running = True
+        self.running = False
 
     def run(self):
         print("start")
         self.initialize()
+        self.running = True
         while self.running:
             self.check_queue()
             self.update()

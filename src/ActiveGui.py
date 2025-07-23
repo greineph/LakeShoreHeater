@@ -97,16 +97,29 @@ class ActiveGui(qtw.QWidget):
         self.show()
 
     def closeEvent(self, event):
-        print("Nope :)")
         dialog = qtw.QDialog(self)
-        dialog.setWindowTitle("No Dude")
+        dialog.setWindowTitle("Are you sure?")
         dialog.setLayout(qtw.QVBoxLayout())
-        label = qtw.QLabel("No thanks :3")
+        dialog.layout().setContentsMargins(30, 30, 30, 30)
+
+        label = qtw.QLabel("Do you want to Exit?")
         label.setFont(qtg.QFont("Bahnschrift", 16))
         dialog.layout().addWidget(label)
-        dialog.layout().setContentsMargins(50, 50, 50, 50)
+
+        btn_holder = qtw.QWidget()
+        btn_holder.setLayout(qtw.QHBoxLayout())
+        btn_holder.layout().setContentsMargins(0, 0, 0, 0)
+        btn_holder.setFont(qtg.QFont("Bahnschrift", 16))
+        yes = qtw.QPushButton("Yes")
+        btn_holder.layout().addWidget(yes)
+        no = qtw.QPushButton("No")
+        btn_holder.layout().addWidget(no)
+        dialog.layout().addWidget(btn_holder)
+
         dialog.exec()
         event.ignore()
+
+
 
     def load_main_tab(self, parent: qtw.QWidget):
         layout = qtw.QVBoxLayout()
