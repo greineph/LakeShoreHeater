@@ -1,4 +1,6 @@
 import random
+import time
+
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 import pandas as pd
@@ -16,17 +18,19 @@ class LiveGraph(Process):
         self.y_axis = y_axis
         self.fig = None
         self.lines: list[plt.Line2D] = []
+        self.running = True
 
     def run(self):
         print("start")
         self.initialize()
-        while True:
+        while self.running:
             self.check_queue()
             self.update()
 
     def initialize(self):
         style.use("seaborn-v0_8-whitegrid")
         self.fig = plt.figure()
+        self.fig.canvas.mpl_connect("close_event", self.on_close)
         ax = self.fig.add_subplot(111)
         plt.ylim(-10, 500)
         plt.xlim(0, 10)
@@ -37,6 +41,9 @@ class LiveGraph(Process):
         ax.legend(self.y_axis)
         plt.tight_layout()
         plt.pause(0.1)
+
+    def on_close(self, event):
+        self.running = False
 
     def check_queue(self):
         while not self.queue.empty():

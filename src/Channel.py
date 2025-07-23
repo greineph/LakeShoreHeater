@@ -11,7 +11,6 @@ class Channel:
 
     SCANNER_SETTLE_TIME = 3
 
-    # TODO: maybe use Device class to get device instead of parameter
     def __init__(self, device: Model372, input_channel: Model372.InputChannel):
         self.device = device
         self.input_channel = input_channel
@@ -41,12 +40,12 @@ class Channel:
     def get_wanted_reading_keys(self) -> list[str]:
         return self.wanted_reading_keys
 
-    # TODO: override kelvin when calibration is selected
     def get_wanted_readings(self) -> list:
         readings = self.get_readings()
         if "resistance" in self.wanted_reading_keys:
             # print(f"original value: {readings['resistance']}")
-            readings["resistance"] = TemperatureCalibration.functions[self.calibration](readings["resistance"])
+            if self.calibration != "None":
+                readings["kelvin"] = TemperatureCalibration.functions[self.calibration](readings["resistance"])
             # print(f"using {self.calibration}: {readings['resistance']}")
         return [readings[key] for key in self.wanted_reading_keys]
 

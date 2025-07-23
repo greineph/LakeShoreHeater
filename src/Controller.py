@@ -65,4 +65,3 @@ class Controller:
         for ch in self.channels:
             ch.functionality.provide_dependencies(self)
 
-    # TODO: behaviour for stopping/exiting

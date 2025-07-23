@@ -6,4 +6,3 @@ if __name__ == "__main__":
     controller = Controller()
     controller.start()
 
-# TODO: Requirements file for ve

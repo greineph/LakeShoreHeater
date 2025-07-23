@@ -100,7 +100,6 @@ class ActiveGui(qtw.QWidget):
         print("Nope :)")
         dialog = qtw.QDialog(self)
         dialog.setWindowTitle("No Dude")
-        # dialog.setFixedSize(200, 100)
         dialog.setLayout(qtw.QVBoxLayout())
         label = qtw.QLabel("No thanks :3")
         label.setFont(qtg.QFont("Bahnschrift", 16))

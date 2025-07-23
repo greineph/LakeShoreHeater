@@ -7,7 +7,6 @@ import InputData
 import threading
 
 
-# TODO: make thread save
 class MPVWrapper:
 
     def __init__(self):
