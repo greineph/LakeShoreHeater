@@ -10,4 +10,5 @@ numpy
 pandas
 PyQt5
 PyQt5-Qt5
-PyQt5_sip
+PyQt5-sip
+scipy
