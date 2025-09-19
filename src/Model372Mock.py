@@ -47,4 +47,5 @@ class Model372Mock(Model372):
         pass
 
     def get_scanner_status(self):
-        return Model372.InputChannel.ONE
+        return {"input_channel": 1,
+                "status": True}

@@ -22,7 +22,8 @@ class Channel:
 
     # returns readings of {kelvin, resistance, power, quadrature(optional)} as dictionary
     def get_readings(self):
-        if self.input_channel != Model372.InputChannel.CONTROL and self.device.get_scanner_status() != self.input_channel:
+        if (self.input_channel != Model372.InputChannel.CONTROL and
+                self.device.get_scanner_status()["input_channel"] != self.input_channel.value):
             self.device.set_scanner_status(self.input_channel.value, False)
             time.sleep(Channel.SCANNER_SETTLE_TIME)
 

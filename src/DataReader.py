@@ -35,7 +35,7 @@ class DataReader(threading.Thread):
                 self.execute_instruction(instruction)
                 self.instruction_queue.remove(instruction)
             if self.is_reading:
-                row = [datetime.now().time(), (datetime.now() - start_timestamp).total_seconds()]
+                row = [datetime.now(), (datetime.now() - start_timestamp).total_seconds()]
                 for ch in self.channels:
                     row += ch.get_wanted_readings()
                 if self.mpv_wrapper:
@@ -73,7 +73,6 @@ class DataReader(threading.Thread):
                 self.unpause()
             case _:
                 pass
-
 
 
 class Instructions(Enum):
