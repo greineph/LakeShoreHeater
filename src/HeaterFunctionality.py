@@ -99,7 +99,7 @@ class HeaterFunctionality(AbstractFunctionality):
 
     # activates the heater of associated channel by changing excitation range
     def activate_heater(self, override=False):
-        if self.heater_active and override:
+        if self.heater_active and not override:
             return
 
         print("activating heater")
