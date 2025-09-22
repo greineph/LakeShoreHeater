@@ -73,11 +73,11 @@ class HeaterFunctionality(AbstractFunctionality):
                 self.deactivate_heater()
 
         elif self.use_stability:
-            std = np.std(self.recent_values)
-            if (std < self.deviation and self.current_value < self.max_threshold and
+            time_based_deviation = self.calculate_time_based_deviation()
+            if (time_based_deviation <= self.deviation and self.current_value < self.max_threshold and
                     len(self.recent_values) == self.number_of_values):
                 self.activate_heater()
-            elif std > self.deviation:
+            elif time_based_deviation > self.deviation:
                 self.deactivate_heater()
 
     # add a new value to be used in update
@@ -88,9 +88,18 @@ class HeaterFunctionality(AbstractFunctionality):
             self.recent_values.remove(self.recent_values[0])
         # print(f"recent vals: {self.recent_values}")
 
+    # calculates relative deviation from recent values
+    def calculate_time_based_deviation(self):
+        deviations = [0]
+        for i in range(1, len(self.recent_values)):
+            deviations.append((self.recent_values[0] - self.recent_values[i]) / (self.interval * i))
+
+        print(abs(sum(deviations) / len(deviations)))
+        return abs(sum(deviations) / len(deviations))
+
     # activates the heater of associated channel by changing excitation range
-    def activate_heater(self):
-        if self.heater_active:
+    def activate_heater(self, override=False):
+        if self.heater_active and override:
             return
 
         print("activating heater")
@@ -129,6 +138,8 @@ class HeaterFunctionality(AbstractFunctionality):
         self.deviation = settings["deviation"]
         self.max_threshold = settings["max"]
         self.active_excitation = settings["active"]
+        if self.heater_active:
+            self.activate_heater(override=True)
         self.interval = settings["interval"]
 
     def update_gui_elements(self):
@@ -235,6 +246,7 @@ def load_gui_elements(parent: qtw.QWidget):
     deviation = qtw.QDoubleSpinBox()
     deviation.setRange(0, 100)
     deviation.setValue(3)
+    deviation.setSuffix(" Oe/s")
     deviation.setButtonSymbols(qtw.QAbstractSpinBox.ButtonSymbols.NoButtons)
     deviation.setAlignment(Qt.AlignRight)
     layout.addRow("Deviation:", deviation)
