@@ -8,6 +8,7 @@ import pandas as pd
 from Channel import Channel
 from src import InputData
 from src.DataReader import DataReader, Instructions
+from src.HeaterFunctionality import HeaterFunctionality
 from src.LiveGraph import LiveGraph
 from MPVWrapper import MPVWrapper
 
@@ -35,6 +36,20 @@ class Datahub:
         self.queue = Queue()
         self.instruction_queue = []
         self.controller = controller
+
+        self.heater_logging_strategy = None
+        for channel in channels:
+            if isinstance(channel.functionality, HeaterFunctionality):
+                self.heater_logging_strategy= {
+                    "channel": channel,
+                    "path": self.save_path.split(".")[0],  # TODO: could be problematic, maybe use regex
+                    "index": 0,
+                    "active": False
+                }
+        if self.heater_logging_strategy:
+            while os.path.exists(self.heater_logging_strategy["path"]):
+                self.heater_logging_strategy["path"] += " (1)"
+            os.makedirs(self.heater_logging_strategy["path"])
 
     # creates Threads to continuously read, log and show data until destroyed
     def start_logging(self, logging_interval=5):
@@ -78,6 +93,15 @@ class Datahub:
         with open(self.save_path, "a") as file:
             file.write(",".join([str(i) for i in data]) + "\n")
         print(data)
+        if self.heater_logging_strategy:
+            if self.heater_logging_strategy["channel"].functionality.heater_active:
+                if not self.heater_logging_strategy["active"]:
+                    self.heater_logging_strategy["active"] = True
+                    self.heater_logging_strategy["index"] += 1
+                with open(os.path.abspath(os.path.join(self.heater_logging_strategy["path"], str(self.heater_logging_strategy["index"]) + ".csv")), "a") as file:
+                    file.write(",".join([str(i) for i in data]) + "\n")
+            else:
+                self.heater_logging_strategy["active"] = False
 
     # creates a csv file from the current data in self.df in {path}
     def write_csv(self, path: str = "./data/out.csv"):
