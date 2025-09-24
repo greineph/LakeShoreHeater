@@ -11,7 +11,7 @@ import sys
 from InputData import range_text_converter
 from Channel import ChannelSettings
 from MPVWrapper import MPVSettings
-from src import TemperatureCalibration, GuiHelper
+from src import TemperatureCalibration, GuiHelper, StartupHandler
 import FunctionalityFunctions
 
 from UliEngineering.Electronics.Resistors import resistor_tolerance
@@ -367,21 +367,26 @@ class SettingsGui(qtw.QWidget):
 
     def submit_forms(self):
         print("submitting")
-        default_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "data", "default.csv"))
-        print(default_path)
+        StartupHandler.load_settings()
+        if os.path.exists(os.path.dirname(StartupHandler.Data.path_log)):
+            path = StartupHandler.Data.path_log
+        else:
+            path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "data", "default.csv"))
 
         if GuiHelper.get_data_from_widget(self.logging_form["append"]):
-            save_path = qtw.QFileDialog.getOpenFileName(self, "Save", default_path)[0]
+            save_path = qtw.QFileDialog.getOpenFileName(self, "Save", path)[0]
             print(save_path)
             self.controller.append_to_file = True
         else:
-            save_path = qtw.QFileDialog.getSaveFileName(self, "Save", default_path)[0]
+            save_path = qtw.QFileDialog.getSaveFileName(self, "Save", path)[0]
             print(save_path)
             self.controller.append_to_file = False
         self.controller.save_path = save_path
 
         if save_path == "":
             return
+        StartupHandler.Data.path_log = save_path
+        StartupHandler.save_settings()
 
         self.controller.configure_lakeshore(ip=GuiHelper.get_data_from_widget(self.lakeshore_form["ip"]),
                                             state=GuiHelper.get_data_from_widget(self.lakeshore_form["state"]),
@@ -440,12 +445,18 @@ class SettingsGui(qtw.QWidget):
         self.close()
 
     def save_settings(self):
-        default_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "settings", "default.json"))
-        print(default_path)
-        save_path = qtw.QFileDialog.getSaveFileName(self, "Save", default_path)[0]
+        print("saving settings")
+        StartupHandler.load_settings()
+        if os.path.exists(os.path.dirname(StartupHandler.Data.path_export)):
+            path = StartupHandler.Data.path_export
+        else:
+            path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "settings", "default.json"))
+        save_path = qtw.QFileDialog.getSaveFileName(self, "Save", path)[0]
         print(save_path)
         if len(save_path) == 0:
             return
+        StartupHandler.Data.path_export = save_path
+        StartupHandler.save_settings()
 
         settings = {"channels": [],
                     "lakeshore": None,
@@ -501,12 +512,17 @@ class SettingsGui(qtw.QWidget):
     # TODO: make import more iterable through use of GuiHelper functions
     def import_settings(self):
         print("loading settings")
-        default_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "settings", "default.json"))
-        print(default_path)
-        save_path = qtw.QFileDialog.getOpenFileName(self, "Save", default_path)[0]
+        StartupHandler.load_settings()
+        if os.path.exists(os.path.dirname(StartupHandler.Data.path_import)):
+            path = StartupHandler.Data.path_import
+        else:
+            path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "settings", "default.json"))
+        save_path = qtw.QFileDialog.getOpenFileName(self, "Save", path)[0]
         print(save_path)
         if len(save_path) == 0:
             return
+        StartupHandler.Data.path_import = save_path
+        StartupHandler.save_settings()
 
         with open(save_path, "r") as file:
             s = "".join(file.readlines())
