@@ -43,6 +43,7 @@ class HeaterFunctionality(AbstractFunctionality):
         # gui elements
         self.active_display = None
         self.toggle_active = None
+        self.power_display = None
 
     def start(self):
         print("start functionality of heater")
@@ -79,6 +80,8 @@ class HeaterFunctionality(AbstractFunctionality):
                 self.activate_heater()
             elif time_based_deviation > self.deviation:
                 self.deactivate_heater()
+
+        self.update_gui_elements()
 
     # add a new value to be used in update
     def add_value(self, value):
@@ -150,12 +153,17 @@ class HeaterFunctionality(AbstractFunctionality):
         if self.toggle_active:
             self.toggle_active.setText("Deactivate" if self.heater_active else "Activate")
 
+        if self.power_display:
+            self.power_display.setText(f"Heater ({self.channel.last_reading['power']}W)")
+            print("changing power display")
+
     def load_active_gui(self, parent):
         parent.setLayout(qtw.QVBoxLayout())
         parent.setFont(qtg.QFont("Bahnschrift", 16))
         title_holder = qtw.QWidget()
         title_holder.setLayout(qtw.QHBoxLayout())
-        title_holder.layout().addWidget(qtw.QLabel("Heater"))
+        self.power_display = qtw.QLabel("Heater")
+        title_holder.layout().addWidget(self.power_display)
         self.active_display = qtw.QLabel("● active" if self.heater_active else "● inactive")
         self.active_display.setStyleSheet(f"color: {'green' if self.heater_active else 'red'}")
         self.active_display.setFont(qtg.QFont("Bahnschrift", 16))

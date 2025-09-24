@@ -19,6 +19,7 @@ class Channel:
         self.wanted_plotting_names = []
         self.calibration = "None"
         self.functionality = None
+        self.last_reading = None
 
     # returns readings of {kelvin, resistance, power, quadrature(optional)} as dictionary
     def get_readings(self):
@@ -27,7 +28,8 @@ class Channel:
             self.device.set_scanner_status(self.input_channel.value, False)
             time.sleep(Channel.SCANNER_SETTLE_TIME)
 
-        return self.device.get_all_input_readings(self.input_channel.value)
+        self.last_reading = self.device.get_all_input_readings(self.input_channel.value)
+        return self.last_reading
 
     # configures channels setup settings in lakeshore device
     def configure_setup_settings(self, settings: Model372InputSetupSettings = None):
