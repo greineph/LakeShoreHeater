@@ -33,13 +33,14 @@ class LiveGraph(Process):
         self.fig = plt.figure()
         self.fig.canvas.mpl_connect("close_event", self.on_close)
         ax = self.fig.add_subplot(111)
-        plt.ylim(-10, 500)
+        plt.yscale("log")
+        plt.ylim(0.1, 500)
         plt.xlim(0, 10)
         plt.ion()
         for y in self.y_axis:
             ln, = ax.plot([], [])
             self.lines.append(ln)
-        ax.legend(self.y_axis)
+        ax.legend(self.y_axis, loc="upper right")
         plt.tight_layout()
         plt.pause(0.1)
 
