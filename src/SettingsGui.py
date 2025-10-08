@@ -5,7 +5,7 @@ import json
 from PyQt5 import QtWidgets as qtw
 from PyQt5 import QtGui as qtg
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QSizePolicy
+from PyQt5.QtWidgets import QSizePolicy, QMenuBar
 import sys
 
 from InputData import range_text_converter
@@ -96,6 +96,10 @@ class SettingsGui(qtw.QWidget):
         import_btn.clicked.connect(self.import_settings)
         self.layout().addWidget(import_btn)
 
+        add_temp_cal_btn = qtw.QPushButton("Add Temperature Calibration")
+        add_temp_cal_btn.clicked.connect(self.open_temp_cal_window)
+        self.layout().addWidget(add_temp_cal_btn)
+
         self.show()
 
     def load_channel_settings_form(self, parent, index=0):
@@ -155,7 +159,7 @@ class SettingsGui(qtw.QWidget):
         resistance_range = qtw.QComboBox(parent)
         for x in Model372.MeasurementInputResistance:
             resistance_range.addItem(range_text_converter(x.name), x)
-        resistance_range.setCurrentIndex(9)                                 # MeasurementInputResistance.RANGE_63_POINT_2_KIL_OHMS
+        resistance_range.setCurrentIndex(9)  # MeasurementInputResistance.RANGE_63_POINT_2_KIL_OHMS
         form_layout.addRow("Resistance Range:", resistance_range)
         channel_form["resistance_range"] = resistance_range
 
@@ -207,11 +211,11 @@ class SettingsGui(qtw.QWidget):
                 if channel.currentIndex() == 0:
                     for x in Model372.ControlInputCurrentRange:
                         excitation_range.addItem(range_text_converter(x.name), x)
-                    excitation_range.setCurrentIndex(1)                     # ControlInputCurrentRange.RANGE_1_NANO_AMP
+                    excitation_range.setCurrentIndex(1)  # ControlInputCurrentRange.RANGE_1_NANO_AMP
                 else:
                     for x in Model372.MeasurementInputCurrentRange:
                         excitation_range.addItem(range_text_converter(x.name), x)
-                    excitation_range.setCurrentIndex(16)                    # MeasurementInputCurrentRange.RANGE_100_MICRO_AMPS
+                    excitation_range.setCurrentIndex(16)  # MeasurementInputCurrentRange.RANGE_100_MICRO_AMPS
             else:  # voltage TODO: sensible default value
                 for x in Model372.MeasurementInputVoltageRange:
                     excitation_range.addItem(range_text_converter(x.name), x)
@@ -240,7 +244,6 @@ class SettingsGui(qtw.QWidget):
 
         # initialize gui elements:
         on_channel_changed(channel.currentIndex())
-
 
     def load_wanted_readings_checkboxes(self, form_layout: qtw.QFormLayout, readings: list[str]) -> list[dict]:
         form_layout.addRow(qtw.QLabel("Select Wanted Readings:"))
@@ -325,9 +328,6 @@ class SettingsGui(qtw.QWidget):
 
         self.lakeshore_form = lakeshore_form
 
-
-
-
     def load_mpv_settings_form(self, parent):
         form_layout = qtw.QFormLayout()
         parent.setLayout(form_layout)
@@ -390,7 +390,8 @@ class SettingsGui(qtw.QWidget):
 
         self.controller.configure_lakeshore(ip=GuiHelper.get_data_from_widget(self.lakeshore_form["ip"]),
                                             state=GuiHelper.get_data_from_widget(self.lakeshore_form["state"]),
-                                            settle_time=GuiHelper.get_data_from_widget(self.lakeshore_form["settle_time"]),
+                                            settle_time=GuiHelper.get_data_from_widget(
+                                                self.lakeshore_form["settle_time"]),
                                             window=GuiHelper.get_data_from_widget(self.lakeshore_form["window"]))
 
         for channel_form in self.channel_forms:
@@ -424,8 +425,6 @@ class SettingsGui(qtw.QWidget):
 
             self.controller.create_channel(channel_settings, functionality)
             # print(channel_settings.create_channel(Device.get_device()))
-
-
 
         mpv_readings = []
         for reading in self.mpv_form["readings"]:
@@ -507,6 +506,10 @@ class SettingsGui(qtw.QWidget):
         with open(save_path, "w") as file:
             s = json.dumps(settings, indent=4)
             file.write(s)
+
+    def open_temp_cal_window(self):
+        print("not implemented yet")
+        pass
 
     # TODO: make import less error prone
     # TODO: make import more iterable through use of GuiHelper functions

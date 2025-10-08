@@ -414,7 +414,7 @@ def cal_UTC01(resistance):
         + 0.00264578347210478 * x ** 13
         - 1.16801687672886E-4 * x ** 14)
 
-    if t < 0.03: #this is quite high, but the cal run was not perfect V2.4r10
+    if t < 0.03:  #this is quite high, but the cal run was not perfect V2.4r10
         return np.nan
     return t
 
@@ -549,3 +549,20 @@ functions = {"None": lambda x: x,
              "cal_cam_cool": cal_cam_cool,
              "cal_ser8": cal_ser8,
              "cal_ser6": cal_ser6}
+
+
+# returns the cal function for the given parameters
+def to_function(parameters: dict):
+    def func(resistance):
+        if resistance < parameters["min_input"] or resistance > parameters["max_input"]:
+            return np.nan
+        x = parameters["rescale_0"] - np.log(resistance - parameters["rescale_1"])
+        total = 0
+        for i in range(len(parameters["func_params"])):
+            total += parameters["func_params"][i] * x ** (i + 1)
+        t = np.exp(total)
+        if t < parameters["min_output"] or t > parameters["max_output"]:
+            return np.nan
+        return t
+
+    return func
