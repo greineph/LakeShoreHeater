@@ -15,6 +15,8 @@ def get_data_from_widget(widget: qtw.QWidget):
             return widget.text()
         case qtw.QSpinBox | qtw.QDoubleSpinBox:
             return widget.value()
+        case qtw.QTextEdit:
+            return widget.toPlainText()
         case _:
             return widget
 

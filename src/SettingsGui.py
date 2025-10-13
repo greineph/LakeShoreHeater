@@ -18,6 +18,7 @@ from UliEngineering.Electronics.Resistors import resistor_tolerance
 from lakeshore import Model372
 
 from src.Device import Device
+from src.TemperatureCalibrationGui import TemperatureCalibrationGui
 
 
 class SettingsGui(qtw.QWidget):
@@ -97,6 +98,7 @@ class SettingsGui(qtw.QWidget):
         self.layout().addWidget(import_btn)
 
         add_temp_cal_btn = qtw.QPushButton("Add Temperature Calibration")
+        self.extra_window = None
         add_temp_cal_btn.clicked.connect(self.open_temp_cal_window)
         self.layout().addWidget(add_temp_cal_btn)
 
@@ -508,8 +510,7 @@ class SettingsGui(qtw.QWidget):
             file.write(s)
 
     def open_temp_cal_window(self):
-        print("not implemented yet")
-        pass
+        self.extra_window = TemperatureCalibrationGui()
 
     # TODO: make import less error prone
     # TODO: make import more iterable through use of GuiHelper functions

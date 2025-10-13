@@ -610,15 +610,18 @@ functions = {"None": lambda x: x,
 # returns the cal function for the given parameters
 def to_function(parameters: dict):
     def func(resistance):
-        if resistance < parameters["min_input"] or resistance > parameters["max_input"]:
+        if resistance < parameters["min_resistance"] or resistance > parameters["max_resistance"]:
             return np.nan
         x = parameters["rescale_0"] - np.log(resistance - parameters["rescale_1"])
         total = 0
         for i in range(len(parameters["func_params"])):
             total += parameters["func_params"][i] * x ** (i + 1)
         t = np.exp(total)
-        if t < parameters["min_output"] or t > parameters["max_output"]:
+        if t < parameters["min_temperature"] or t > parameters["max_temperature"]:
             return np.nan
         return t
 
     return func
+
+def get_functions():
+    pass
