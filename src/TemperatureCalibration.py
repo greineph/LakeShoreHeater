@@ -581,7 +581,7 @@ def cal_ser6(x):
     return np.exp(
         -418.66269190557 + 2030.22369066585 * x - 4302.49551086799 * x ** 2 + 5133.14952507189 * x ** 3 - 3719.23040793288 * x ** 4 + 1605.56403609629 * x ** 5 - 332.397935938044 * x ** 6 - 23.0801113001037 * x ** 7 + 26.8652824936315 * x ** 8 - 1.88491652328337 * x ** 9 - 2.21422793002565 * x ** 10 + 0.813246835982012 * x ** 11 - 0.129335143412473 * x ** 12 + 0.0100828066451444 * x ** 13 - 3.06270610070887E-4 * x ** 14)
 
-
+# TODO: remove deprecated functions and migrate coded ones to json
 functions = {"None": lambda x: x,
              "cal_RX202A": cal_RX202A,
              "cal_RX202A_ULT": cal_RX202A_ULT,
@@ -618,7 +618,7 @@ def to_function(parameters: dict):
         x = parameters["rescale_0"] - np.log(resistance - parameters["rescale_1"])
         total = 0
         for i in range(len(parameters["func_params"])):
-            total += parameters["func_params"][i] * x ** (i + 1)
+            total += parameters["func_params"][i] * x ** i
         t = np.exp(total)
         if t < parameters["min_temperature"] or t > parameters["max_temperature"]:
             return np.nan
@@ -626,6 +626,7 @@ def to_function(parameters: dict):
 
     return func
 
+# generates calibration functions from all json files in calibrations folder
 def get_functions():
     path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "calibrations"))
     calibrations = {}
@@ -638,5 +639,12 @@ def get_functions():
             params = json.loads(s)
         print(params)
         func = to_function(params)
-        calibrations[params["name"]] = func
-    print(calibrations)
+        functions[params["name"]] = func
+    print(functions)
+
+
+get_functions()
+# for i in range(20):
+#     print("new test:")
+#     print(cal_UTCC_2A(18000 + i * 50))
+#     print(functions["test"](18000 + i * 50))
