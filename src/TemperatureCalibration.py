@@ -1,3 +1,6 @@
+import json
+import os
+
 import numpy as np
 from UliEngineering.Physics.RTD import pt1000_temperature
 
@@ -624,4 +627,16 @@ def to_function(parameters: dict):
     return func
 
 def get_functions():
-    pass
+    path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "calibrations"))
+    calibrations = {}
+    print(os.listdir(path))
+    for f in os.listdir(path):
+        with open(os.path.join(path, f), "r") as file:
+            if not file.name.endswith(".json"):
+                continue
+            s = "".join(file.readlines())
+            params = json.loads(s)
+        print(params)
+        func = to_function(params)
+        calibrations[params["name"]] = func
+    print(calibrations)
