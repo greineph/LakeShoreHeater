@@ -627,8 +627,12 @@ def to_function(parameters: dict):
     return func
 
 # generates calibration functions from all json files in calibrations folder
-def get_functions():
+def generate_functions_from_files():
     path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "calibrations"))
+    if not os.path.exists(path):
+        print("no calibrations folder found")
+        return
+
     calibrations = {}
     print(os.listdir(path))
     for f in os.listdir(path):
@@ -642,9 +646,4 @@ def get_functions():
         functions[params["name"]] = func
     print(functions)
 
-
-get_functions()
-# for i in range(20):
-#     print("new test:")
-#     print(cal_UTCC_2A(18000 + i * 50))
-#     print(functions["test"](18000 + i * 50))
+generate_functions_from_files()

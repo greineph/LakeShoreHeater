@@ -116,8 +116,11 @@ class TemperatureCalibrationGui(qtw.QWidget):
         }
         print(values)
 
-        path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "calibrations", str(name) + ".json"))
-        with open(path, "w") as file:
+        path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "calibrations"))
+        if not os.path.exists(path):
+            os.makedirs(path)
+
+        with open(os.path.join(path, str(name) + ".json"), "w") as file:
             s = json.dumps(values, indent=4)
             file.write(s)
 

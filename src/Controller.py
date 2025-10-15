@@ -3,10 +3,12 @@ from threading import Thread
 from lakeshore import Model372
 import InputData
 from Channel import Channel
+from src import TemperatureCalibration
 from src.AbstractFunctionality import AbstractFunctionality
 from src.Device import Device
 from src.Datahub import Datahub
 from src.Heater import Heater
+from src.TemperatureCalibrationGui import TemperatureCalibrationGui
 from src.Thermometer import Thermometer
 from src.Channel import Channel, ChannelSettings
 from MPVWrapper import MPVWrapper, MPVSettings
@@ -24,6 +26,7 @@ class Controller:
         self.logging_interval = 5
         self.save_path = ""
         self.append_to_file = False
+        TemperatureCalibration.generate_functions_from_files()
         SettingsGui.show_gui(self)
         self.datahub = Datahub(channels=self.channels,
                                mpv_wrapper=self.mpv_wrapper,
