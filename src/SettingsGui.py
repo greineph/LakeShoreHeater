@@ -55,6 +55,12 @@ class SettingsGui(qtw.QWidget):
         label.setAlignment(Qt.AlignCenter)
         self.layout().addWidget(label)
 
+        if Device.DEBUG_MODE:
+            warning = qtw.QLabel("DEBUG MODE ACTIVE")
+            warning.setAlignment(Qt.AlignCenter)
+            warning.setStyleSheet("color: yellow; background-color: black; font-size: 20pt; ")
+            self.layout().addWidget(warning)
+
         form_holder_holder = qtw.QWidget()
         form_holder_holder.setLayout(qtw.QHBoxLayout())
         self.layout().addWidget(form_holder_holder)
