@@ -43,10 +43,6 @@ class TemperatureCalibrationGui(qtw.QWidget):
         name = qtw.QLineEdit(self)
         form_layout.addRow("Name", name)
         self.form["name"] = name
-        # name.setStyleSheet("border-style: solid; border-width: 2px; border-color: red;")
-        print(name.styleSheet())
-        print(self.styleSheet())
-        print(self.style())
 
         min_resistance = qtw.QLineEdit()
         form_layout.addRow("Minimum Resistance", min_resistance)
@@ -81,6 +77,8 @@ class TemperatureCalibrationGui(qtw.QWidget):
         self.form["max_temperature"] = max_temperature
 
         create_btn = qtw.QPushButton("Create")
+        create_btn.setStyleSheet("color: white; background-color: #294c78; font-size: 16pt; ")
+        create_btn.setMinimumHeight(80)
         create_btn.clicked.connect(self.create_file)
         self.layout().addWidget(create_btn)
 
@@ -94,53 +92,65 @@ class TemperatureCalibrationGui(qtw.QWidget):
         name = GuiHelper.get_data_from_widget(self.form["name"])
         if len(name) == 0:
             self.form["name"].setStyleSheet(error_style_sheet)
+            self.form["name"].setToolTip("can't be empty")
             has_error = True
         else:
             self.form["name"].setStyleSheet(default_style_sheet)
+            self.form["name"].setToolTip("")
 
         min_resistance = GuiHelper.get_data_from_widget(self.form["min_resistance"])
         print(min_resistance)
         if not is_number(min_resistance):
             self.form["min_resistance"].setStyleSheet(error_style_sheet)
+            self.form["min_resistance"].setToolTip("has to be a number")
             has_error = True
         else:
             min_resistance = float(min_resistance)
             self.form["min_resistance"].setStyleSheet(default_style_sheet)
+            self.form["min_resistance"].setToolTip("")
 
         max_resistance = GuiHelper.get_data_from_widget(self.form["max_resistance"])
         print(max_resistance)
         if not is_number(max_resistance):
             self.form["max_resistance"].setStyleSheet(error_style_sheet)
+            self.form["max_resistance"].setToolTip("has to be a number")
             has_error = True
         else:
             max_resistance = float(max_resistance)
             self.form["max_resistance"].setStyleSheet(default_style_sheet)
+            self.form["max_resistance"].setToolTip("")
 
         rescale_0 = GuiHelper.get_data_from_widget(self.form["rescale_0"])
         print(rescale_0)
         if not is_number(rescale_0):
             self.form["rescale_0"].setStyleSheet(error_style_sheet)
+            self.form["rescale_0"].setToolTip("has to be a number")
             has_error = True
         else:
             rescale_0 = float(rescale_0)
             self.form["rescale_0"].setStyleSheet(default_style_sheet)
+            self.form["rescale_0"].setToolTip("")
 
         rescale_1 = GuiHelper.get_data_from_widget(self.form["rescale_1"])
         print(rescale_1)
         if not is_number(rescale_1):
             self.form["rescale_1"].setStyleSheet(error_style_sheet)
+            self.form["rescale_1"].setToolTip("has to be a number")
             has_error = True
         else:
             rescale_1 = float(rescale_1)
             self.form["rescale_1"].setStyleSheet(default_style_sheet)
+            self.form["rescale_1"].setToolTip("")
 
         func_params = GuiHelper.get_data_from_widget(self.form["func_params"])
         func_params = func_params.split("\n")
         print(func_params)
         self.form["func_params"].setStyleSheet(default_style_sheet)
+        self.form["func_params"].setToolTip("")
         for n in func_params:
             if not is_number(n):
                 self.form["func_params"].setStyleSheet(error_style_sheet)
+                self.form["func_params"].setToolTip("has to be a list of numbers\nseparated by \\n")
                 has_error = True
                 break
         if not has_error:
@@ -149,18 +159,22 @@ class TemperatureCalibrationGui(qtw.QWidget):
         min_temperature = GuiHelper.get_data_from_widget(self.form["min_temperature"])
         if not is_number(min_temperature):
             self.form["min_temperature"].setStyleSheet(error_style_sheet)
+            self.form["min_temperature"].setToolTip("has to be a number")
             has_error = True
         else:
             min_temperature = float(min_temperature)
             self.form["min_temperature"].setStyleSheet(default_style_sheet)
+            self.form["min_temperature"].setToolTip("")
 
         max_temperature = GuiHelper.get_data_from_widget(self.form["max_temperature"])
         if not is_number(max_temperature):
             self.form["max_temperature"].setStyleSheet(error_style_sheet)
+            self.form["max_temperature"].setToolTip("has to be a number")
             has_error = True
         else:
             max_temperature = float(max_temperature)
             self.form["max_temperature"].setStyleSheet(default_style_sheet)
+            self.form["max_temperature"].setToolTip("")
 
         if has_error:
             print("inputs were incomplete or wrong")
