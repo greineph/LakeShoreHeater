@@ -379,7 +379,7 @@ class SettingsGui(qtw.QWidget):
         if os.path.exists(os.path.dirname(StartupHandler.Data.path_log)):
             path = StartupHandler.Data.path_log
         else:
-            path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "data", "default.csv"))
+            path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "data", "default.adr"))
 
         if GuiHelper.get_data_from_widget(self.logging_form["append"]):
             save_path = qtw.QFileDialog.getOpenFileName(self, "Save", path)[0]
