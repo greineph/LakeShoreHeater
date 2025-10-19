@@ -34,7 +34,7 @@ class ActiveGui(qtw.QWidget):
         self.layout().setContentsMargins(0, 0, 0, 0)
 
         self.setFont(qtg.QFont("Bahnschrift", 16))
-        self.setStyleSheet(" QToolTip{ font: 16pt }")
+        # self.setStyleSheet(" QToolTip{ font: 16pt }")
         self.setToolTipDuration(0)
 
         tabs = qtw.QTabWidget()
@@ -52,7 +52,7 @@ class ActiveGui(qtw.QWidget):
         channel_holder = qtw.QWidget()
         channel_holder.setLayout(qtw.QHBoxLayout())
         channel_holder.layout().setContentsMargins(0, 0, 0, 0)
-        for ch in self.controller.channels:
+        for ch in (self.controller.channels if self.controller else []):
             settings_holder = qtw.QWidget()
             self.load_channel_settings_form(settings_holder, ch.input_channel.value)
             channel_holder.layout().addWidget(settings_holder)
@@ -85,14 +85,23 @@ class ActiveGui(qtw.QWidget):
         functionality_holder = qtw.QWidget()
         functionality_holder.setLayout(qtw.QHBoxLayout())
         functionality_holder.layout().setContentsMargins(0, 0, 0, 0)
-        for ch in self.controller.channels:
+        for ch in (self.controller.channels if self.controller else []):
             settings_holder = qtw.QWidget()
-            self.load_functionality_settings_(settings_holder, ch.functionality)
+            self.load_functionality_settings(settings_holder, ch.functionality)
             functionality_holder.layout().addWidget(settings_holder)
         functionality_tab.layout().addWidget(functionality_holder)
         tabs.addTab(functionality_tab, "Functionality")
 
-        tabs.setCurrentIndex(2)
+        # graph tab
+        graph_tab = qtw.QWidget()
+        graph_tab.setLayout(qtw.QVBoxLayout())
+
+        graph_holder = qtw.QWidget()
+        self.load_graph_tab(graph_holder)
+        graph_tab.layout().addWidget(graph_holder)
+        tabs.addTab(graph_tab, "LiveGraph")
+
+        tabs.setCurrentIndex(3)
 
         self.show()
 
@@ -118,8 +127,6 @@ class ActiveGui(qtw.QWidget):
 
         dialog.exec()
         event.ignore()
-
-
 
     def load_main_tab(self, parent: qtw.QWidget):
         layout = qtw.QVBoxLayout()
@@ -195,7 +202,8 @@ class ActiveGui(qtw.QWidget):
         resistance_range = qtw.QComboBox()
         for x in Model372.MeasurementInputResistance:
             resistance_range.addItem(range_text_converter(x.name), x)
-        resistance_range.setCurrentIndex(0 if index == "A" else channel_settings.resistance_range - 1)  # -1 because enum starts at 1, why?
+        resistance_range.setCurrentIndex(
+            0 if index == "A" else channel_settings.resistance_range - 1)  # -1 because enum starts at 1, why?
         if index != "A":
             form_layout.addRow("Resistance Range:", resistance_range)
         channel_form["resistance_range"] = resistance_range
@@ -219,10 +227,25 @@ class ActiveGui(qtw.QWidget):
         mode.currentIndexChanged.connect(on_excitation_mode_changed)
 
         on_excitation_mode_changed(mode.currentData().value)
-        excitation_range.setCurrentIndex(channel_settings.excitation_range - 1)  # -1 because bad enums (they start at 1)
+        excitation_range.setCurrentIndex(
+            channel_settings.excitation_range - 1)  # -1 because bad enums (they start at 1)
 
-    def load_functionality_settings_(self, parent, functionality):
+    def load_functionality_settings(self, parent, functionality):
         functionality.load_active_gui(parent)
+
+    def load_graph_tab(self, parent: qtw.QWidget):
+        layout = qtw.QVBoxLayout()
+        parent.setLayout(layout)
+        parent.setFont(qtg.QFont("Bahnschrift", 16))
+
+        auto_xlim = qtw.QCheckBox("Auto adjust X-Axis", parent)
+        layout.addWidget(auto_xlim)
+
+        auto_ylim = qtw.QCheckBox("Auto adjust Y-Axis", parent)
+        layout.addWidget(auto_ylim)
+
+        label = qtw.QLabel("STUFF HERE")
+        layout.addWidget(label)
 
 
 def show_gui(controller):

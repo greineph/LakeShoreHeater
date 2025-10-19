@@ -88,7 +88,7 @@ class Datahub:
 
     # appends {data} to self.df
     def update(self, data):
-        self.queue.put(data)
+        self.queue.put(["data", data])
         self.df.loc[len(self.df)] = data
         with open(self.save_path, "a") as file:
             file.write(",".join([str(i) for i in data]) + "\n")
