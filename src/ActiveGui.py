@@ -13,6 +13,7 @@ from src import GuiHelper, FunctionalityFunctions
 from src.AbstractFunctionality import AbstractFunctionality
 from src.Device import Device
 from src.InputData import range_text_converter
+from src.LiveGraph import Operations
 from src.SettingsGui import SettingsGui
 
 
@@ -23,6 +24,7 @@ class ActiveGui(qtw.QWidget):
         self.controller = controller
         self.paused = False
         self.channels = []
+        self.queue = self.controller.datahub.queue if controller else None
 
         self.setGeometry(100, 100, 400, 0)
         # self.setWindowState(Qt.WindowMaximized)
@@ -239,10 +241,25 @@ class ActiveGui(qtw.QWidget):
         parent.setFont(qtg.QFont("Bahnschrift", 16))
 
         auto_xlim = qtw.QCheckBox("Auto adjust X-Axis", parent)
+        auto_xlim.setChecked(True)
         layout.addWidget(auto_xlim)
 
         auto_ylim = qtw.QCheckBox("Auto adjust Y-Axis", parent)
         layout.addWidget(auto_ylim)
+
+        def on_change(state: int, axis: str):
+            print(f"{axis}-axis is set to {bool(state)}")
+            if self.queue is None:
+                return
+
+            if axis == "x":
+                op = Operations.ENABLE_XLIM if state else Operations.DISABLE_XLIM
+            else:
+                op = Operations.ENABLE_YLIM if state else Operations.DISABLE_YLIM
+            self.queue.put(["op", op])
+
+        auto_xlim.stateChanged.connect(lambda s, a="x": on_change(s, a))
+        auto_ylim.stateChanged.connect(lambda s, a="y": on_change(s, a))
 
         label = qtw.QLabel("STUFF HERE")
         layout.addWidget(label)

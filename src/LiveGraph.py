@@ -25,7 +25,9 @@ class LiveGraph(Process):
         self.auto_ylim = False
         self.ylim_values = [0.1, 500]
 
+        # for testing
         self.timestamp = time.monotonic()
+        self.timer = 0
 
     def run(self):
         print("start")
@@ -76,10 +78,24 @@ class LiveGraph(Process):
                 self.auto_xlim = False
             case Operations.ENABLE_YLIM:
                 self.auto_ylim = True
-            case Operations.ENABLE_YLIM:
+            case Operations.DISABLE_YLIM:
                 self.auto_ylim = False
+            case Operations.CENTRE_GRAPHS:
+                self.centre_graphs()
             case _:
                 pass
+
+    # sets the x/ylim values of the plot according to the min and max values in df
+    def centre_graphs(self):
+        if self.df.empty:
+            return
+
+        x_vals = self.df[self.x_axis]
+        plt.xlim(x_vals[0], x_vals[len(x_vals) - 1] + 5)
+
+        y_vals = self.df[self.y_axis]
+        self.ylim_values = [y_vals.min().min(), y_vals.max().max()]
+        plt.ylim(self.ylim_values[0] * 0.9, self.ylim_values[1] * 1.1)
 
     def update(self):
         if self.df.empty:
@@ -106,7 +122,10 @@ class LiveGraph(Process):
 
         # used for performance testing
         temp = time.monotonic()
-        print(f"time: {temp - self.timestamp}\nfps: {(temp - self.timestamp) ** -1}")
+        self.timer += temp - self.timestamp
+        if self.timer > 1:
+            self.timer = 0
+            print(f"time: {temp - self.timestamp}\nfps: {(temp - self.timestamp) ** -1}")
         self.timestamp = temp
 
 
@@ -115,3 +134,4 @@ class Operations(Enum):
     DISABLE_XLIM = 1
     ENABLE_YLIM = 2
     DISABLE_YLIM = 3
+    CENTRE_GRAPHS = 4
