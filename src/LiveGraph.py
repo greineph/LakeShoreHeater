@@ -22,7 +22,7 @@ class LiveGraph(Process):
         self.running = False
 
         self.auto_xlim = True
-        self.auto_ylim = True
+        self.auto_ylim = False
         self.ylim_values = [0.1, 500]
 
         self.timestamp = time.monotonic()
@@ -67,17 +67,18 @@ class LiveGraph(Process):
 
     def add_data(self, data):
         self.df.loc[len(self.df)] = data
-        # row = self.df[self.y_axis].iloc(len(self.df)-1).to_numpy()
-        # print(row)
-        # if min(row) < self.ylim_values[0]:
-        #     self.ylim_values[0] = min(row)
-        # if max(row) > self.ylim_values[1]:
-        #     self.ylim_values[1] = max(row)
-
 
     def execute_operation(self, op):
         match op:
             case Operations.ENABLE_XLIM:
+                self.auto_xlim = True
+            case Operations.DISABLE_XLIM:
+                self.auto_xlim = False
+            case Operations.ENABLE_YLIM:
+                self.auto_ylim = True
+            case Operations.ENABLE_YLIM:
+                self.auto_ylim = False
+            case _:
                 pass
 
     def update(self):
@@ -86,24 +87,27 @@ class LiveGraph(Process):
 
         x_vals = self.df[self.x_axis].tolist()
         val_len = len(x_vals)
-        y_vals = None
         for i in range(len(self.y_axis)):
             y_vals = self.df[self.y_axis[i]].tolist()[:val_len]
             self.lines[i].set_xdata(x_vals)
             self.lines[i].set_ydata(y_vals)
+            if y_vals[-1] < self.ylim_values[0]:
+                self.ylim_values[0] = y_vals[-1]
+            if y_vals[-1] > self.ylim_values[1]:
+                self.ylim_values[1] = y_vals[-1]
 
         if self.auto_xlim:
             plt.xlim(x_vals[0], max(10, x_vals[-1]))
-        # if self.auto_ylim and y_vals:
-        #     plt.ylim(0, max(y_vals))
+        if self.auto_ylim:
+            plt.ylim(self.ylim_values[0] * 0.9, self.ylim_values[1] * 1.1)
 
         self.fig.canvas.draw()
         self.fig.canvas.flush_events()
 
         # used for performance testing
-        # temp = time.monotonic()
-        # print(f"time: {temp - self.timestamp}\nfps: {(temp- self.timestamp)**-1}")
-        # self.timestamp = temp
+        temp = time.monotonic()
+        print(f"time: {temp - self.timestamp}\nfps: {(temp - self.timestamp) ** -1}")
+        self.timestamp = temp
 
 
 class Operations(Enum):
