@@ -247,6 +247,9 @@ class ActiveGui(qtw.QWidget):
         auto_ylim = qtw.QCheckBox("Auto adjust Y-Axis", parent)
         layout.addWidget(auto_ylim)
 
+        centre_graph = qtw.QPushButton("Centre Graph")
+        layout.addWidget(centre_graph)
+
         def on_change(state: int, axis: str):
             print(f"{axis}-axis is set to {bool(state)}")
             if self.queue is None:
@@ -263,6 +266,8 @@ class ActiveGui(qtw.QWidget):
 
         label = qtw.QLabel("STUFF HERE")
         layout.addWidget(label)
+
+        centre_graph.clicked.connect(lambda: self.queue.put(["op", Operations.CENTRE_GRAPHS]))
 
 
 def show_gui(controller):

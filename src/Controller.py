@@ -7,7 +7,6 @@ from src import TemperatureCalibration
 from src.AbstractFunctionality import AbstractFunctionality
 from src.Device import Device
 from src.Datahub import Datahub
-from src.Heater import Heater
 from src.TemperatureCalibrationGui import TemperatureCalibrationGui
 from src.Thermometer import Thermometer
 from src.Channel import Channel, ChannelSettings

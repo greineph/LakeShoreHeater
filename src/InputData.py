@@ -1,5 +1,6 @@
 from lakeshore import Model372, Model372InputChannelSettings
 
+# [DEPRECATED] mostly
 # Variable Data, should be set before start
 
 # ip address of the lakeshore module

@@ -98,13 +98,13 @@ class Datahub:
                 if not self.heater_logging_strategy["active"]:
                     self.heater_logging_strategy["active"] = True
                     self.heater_logging_strategy["index"] += 1
-                with open(os.path.abspath(os.path.join(self.heater_logging_strategy["path"], str(self.heater_logging_strategy["index"]) + ".csv")), "a") as file:
+                with open(os.path.abspath(os.path.join(self.heater_logging_strategy["path"], str(self.heater_logging_strategy["index"]) + ".adr")), "a") as file:
                     file.write(",".join([str(i) for i in data]) + "\n")
             else:
                 self.heater_logging_strategy["active"] = False
 
     # creates a csv file from the current data in self.df in {path}
-    def write_csv(self, path: str = "./data/out.csv"):
+    def write_csv(self, path: str = "./data/out.adr"):
         self.df.to_csv(path, encoding="utf-8", index=False)
 
     def get_data(self) -> pd.DataFrame:
