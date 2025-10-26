@@ -103,7 +103,16 @@ class ActiveGui(qtw.QWidget):
         graph_tab.layout().addWidget(graph_holder)
         tabs.addTab(graph_tab, "LiveGraph")
 
-        tabs.setCurrentIndex(3)
+        # mpv tab
+        mpv_tab = qtw.QWidget()
+        mpv_tab.setLayout(qtw.QVBoxLayout())
+
+        mpv_holder = qtw.QWidget()
+        self.load_mpv_tab(mpv_holder)
+        mpv_tab.layout().addWidget(mpv_holder)
+        tabs.addTab(mpv_tab, "MPV")
+
+        tabs.setCurrentIndex(4)
 
         self.show()
 
@@ -268,6 +277,23 @@ class ActiveGui(qtw.QWidget):
         layout.addWidget(label)
 
         centre_graph.clicked.connect(lambda: self.queue.put(["op", Operations.CENTRE_GRAPHS]))
+
+    def load_mpv_tab(self, parent: qtw.QWidget):
+        layout = qtw.QFormLayout()
+        parent.setLayout(layout)
+        parent.setFont(qtg.QFont("Bahnschrift", 16))
+
+        tuning1 = qtw.QLineEdit()
+        layout.addRow("t1", tuning1)
+        tuning2 = qtw.QLineEdit()
+        layout.addRow("t2", tuning2)
+        tuning3 = qtw.QLineEdit()
+        layout.addRow("t3", tuning3)
+        b = qtw.QPushButton("Apply")
+        layout.addRow("", b)
+        layout.addRow("", qtw.QLabel(""))
+        toggle = qtw.QPushButton("ON/OFF")
+        layout.addRow(toggle)
 
 
 def show_gui(controller):
