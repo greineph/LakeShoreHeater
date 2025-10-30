@@ -689,7 +689,9 @@ functions = {"None": lambda x: x,
              "cal_pt1000": cal_pt1000,
              "cal_cam_cool": cal_cam_cool,
              "cal_ser8": cal_ser8,
-             "cal_ser6": cal_ser6}
+             "cal_ser6": cal_ser6,
+             "cal_UTC1kB01": cal_UTC1kB01,
+             "cal_UTC1kC01": cal_UTC1kC01}
 
 
 # returns the cal function for the given parameters
