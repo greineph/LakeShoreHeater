@@ -66,6 +66,10 @@ class MPVWrapper:
         self.client.close_client()
         self.server.close()
 
+    def set_ramp_rate(self, ramp_rate):
+        self.client.set_field(0, ramp_rate, mpv.Client.field.approach_mode.linear)
+
+
 
 class MPVSettings:
 

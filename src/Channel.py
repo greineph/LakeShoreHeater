@@ -29,6 +29,8 @@ class Channel:
             time.sleep(Channel.SCANNER_SETTLE_TIME)
 
         self.last_reading = self.device.get_all_input_readings(self.input_channel.value)
+        if self.calibration != "None":
+            self.last_reading["kelvin"] = TemperatureCalibration.functions[self.calibration](self.last_reading["resistance"])
         return self.last_reading
 
     # configures channels setup settings in lakeshore device
@@ -43,6 +45,7 @@ class Channel:
     def get_wanted_reading_keys(self) -> list[str]:
         return self.wanted_reading_keys
 
+    # TODO: remove redundancy of calibration
     def get_wanted_readings(self) -> list:
         readings = self.get_readings()
         if "resistance" in self.wanted_reading_keys:
