@@ -11,6 +11,7 @@ from src.TemperatureCalibrationGui import TemperatureCalibrationGui
 from src.Thermometer import Thermometer
 from src.Channel import Channel, ChannelSettings
 from MPVWrapper import MPVWrapper, MPVSettings
+from PidController import PidController
 import src.SettingsGui as SettingsGui
 import src.ActiveGui as ActiveGui
 
@@ -21,6 +22,7 @@ class Controller:
     def __init__(self):
         self.channels = []
         self.mpv_wrapper = None
+        self.pid_controller = None
         self.ready = False
         self.logging_interval = 5
         self.save_path = ""
@@ -33,6 +35,10 @@ class Controller:
                                append_to_file=self.append_to_file,
                                controller=self)
         self.provide_dependencies()
+        try:
+            self.pid_controller = PidController(self.channels[0], self.mpv_wrapper)
+        except Exception:
+            print("something wrong with pid instantiation")
 
     # starts the process
     def start(self):

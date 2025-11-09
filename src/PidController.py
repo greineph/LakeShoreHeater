@@ -6,12 +6,12 @@ import threading
 
 class PidController:
 
-    def __init__(self, mpv, channel, tunings, interval):
+    def __init__(self, mpv, channel, tunings=(1, 0.1, 0.05), interval=1):
         self.mpv = mpv
         self.channel = channel
         self.tunings = tunings
         self.interval = interval
-        self.pid = PID(1, 0.1, 0.05, setpoint=0)
+        self.pid = PID(self.tunings, setpoint=0)
         self.pid.output_limits = (0, 50)
         self.thread = None
         self.running = False
@@ -34,4 +34,7 @@ class PidController:
 
     def stop(self):
         self.running = False
+
+    def change_tunings(self, tunings):
+        self.pid.tunings = tunings
 
