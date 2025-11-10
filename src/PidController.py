@@ -35,6 +35,7 @@ class PidController:
     def stop(self):
         self.running = False
 
-    def change_tunings(self, tunings):
+    def change_settings(self, tunings, setpoint):
         self.pid.tunings = tunings
+        self.pid.setpoint = setpoint
 

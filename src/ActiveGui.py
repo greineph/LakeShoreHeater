@@ -25,6 +25,7 @@ class ActiveGui(qtw.QWidget):
         self.paused = False
         self.channels = []
         self.queue = self.controller.datahub.queue if controller else None
+        self.pid = self.controller.pid_controller if controller else None
 
         self.setGeometry(100, 100, 400, 0)
         # self.setWindowState(Qt.WindowMaximized)
@@ -284,16 +285,37 @@ class ActiveGui(qtw.QWidget):
         parent.setFont(qtg.QFont("Bahnschrift", 16))
 
         tuning1 = qtw.QLineEdit()
+        tuning1.setAlignment(Qt.AlignCenter)
         layout.addRow("t1", tuning1)
         tuning2 = qtw.QLineEdit()
+        tuning2.setAlignment(Qt.AlignCenter)
         layout.addRow("t2", tuning2)
         tuning3 = qtw.QLineEdit()
+        tuning3.setAlignment(Qt.AlignCenter)
         layout.addRow("t3", tuning3)
-        b = qtw.QPushButton("Apply")
-        layout.addRow("", b)
+        setpoint = qtw.QLineEdit()
+        setpoint.setAlignment(Qt.AlignCenter)
+        layout.addRow("setpoint", setpoint)
+        apply_btn = qtw.QPushButton("Apply")
+        layout.addRow("", apply_btn)
         layout.addRow("", qtw.QLabel(""))
         toggle = qtw.QPushButton("ON/OFF")
         layout.addRow(toggle)
+
+        def apply_settings():
+            try:
+                tunings = (float(GuiHelper.get_data_from_widget(tuning1)),
+                           float(GuiHelper.get_data_from_widget(tuning2)),
+                           float(GuiHelper.get_data_from_widget(tuning3)))
+                setpoint_val = float(GuiHelper.get_data_from_widget(setpoint))
+                print(f"{tunings}, {setpoint_val}")
+                self.pid.change_settings(tunings, setpoint_val)
+            except ValueError:
+                print("couldn't convert inputs to floats")
+            except AttributeError:
+                print("no pid_controller available")
+
+        apply_btn.clicked.connect(apply_settings)
 
 
 def show_gui(controller):
