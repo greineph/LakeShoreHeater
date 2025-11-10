@@ -36,7 +36,8 @@ class Controller:
                                controller=self)
         self.provide_dependencies()
         try:
-            self.pid_controller = PidController(self.channels[0], self.mpv_wrapper)
+            self.pid_controller = PidController(mpv=self.mpv_wrapper,
+                                                channel=self.channels[0])
         except Exception:
             print("something wrong with pid instantiation")
 
