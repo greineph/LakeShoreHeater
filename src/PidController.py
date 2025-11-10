@@ -28,7 +28,6 @@ class PidController:
             self.execute()
             time.sleep(self.interval)
 
-    # TODO: implement start value
     def start(self, start_value=None):
         self.is_running = True
         if start_value is not None:
