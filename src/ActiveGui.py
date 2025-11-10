@@ -107,6 +107,7 @@ class ActiveGui(qtw.QWidget):
         # mpv tab
         mpv_tab = qtw.QWidget()
         mpv_tab.setLayout(qtw.QVBoxLayout())
+        self.pid_active_display = qtw.QLabel()
 
         mpv_holder = qtw.QWidget()
         self.load_mpv_tab(mpv_holder)
@@ -299,8 +300,24 @@ class ActiveGui(qtw.QWidget):
         apply_btn = qtw.QPushButton("Apply")
         layout.addRow("", apply_btn)
         layout.addRow("", qtw.QLabel(""))
-        toggle = qtw.QPushButton("ON/OFF")
-        layout.addRow(toggle)
+
+        if self.pid:
+            self.pid_active_display = qtw.QLabel("● active" if self.pid.is_running else "● inactive")
+            self.pid_active_display.setStyleSheet(f"color: {'green' if self.pid.is_running else 'red'}")
+            self.pid_active_display.setFont(qtg.QFont("Bahnschrift", 16))
+        layout.addRow(self.pid_active_display)
+        start_holder = qtw.QWidget()
+        start_holder.setLayout(qtw.QHBoxLayout())
+        start_holder.layout().setContentsMargins(0, 0, 0, 0)
+        start_btn = qtw.QPushButton("Start")
+        start_holder.layout().addWidget(start_btn)
+        start_value = qtw.QLineEdit()
+        start_value.setAlignment(Qt.AlignCenter)
+        start_value.setPlaceholderText("start at")
+        start_holder.layout().addWidget(start_value)
+        layout.addRow(start_holder)
+        stop_btn = qtw.QPushButton("Stop")
+        layout.addRow(stop_btn)
 
         def apply_settings():
             try:
@@ -316,6 +333,31 @@ class ActiveGui(qtw.QWidget):
                 print("no pid_controller available")
 
         apply_btn.clicked.connect(apply_settings)
+
+        def update_active_display():
+            print(f"updating display with: {self.pid.is_running}")
+            self.pid_active_display.setText("● active" if self.pid.is_running else "● inactive")
+            self.pid_active_display.setStyleSheet(f"color: {'green' if self.pid.is_running else 'red'}")
+            self.pid_active_display.setFont(qtg.QFont("Bahnschrift", 16))
+
+        def start_pid():
+            try:
+                start_val = float(GuiHelper.get_data_from_widget(start_value))
+            except ValueError:
+                print("no valid start value")
+            print("starting pid")
+            self.pid.start()
+            update_active_display()
+
+        start_btn.clicked.connect(start_pid)
+
+        def stop_pid():
+            print("stopping pid")
+            self.pid.stop()
+            update_active_display()
+
+        stop_btn.clicked.connect(stop_pid)
+
 
 
 def show_gui(controller):
