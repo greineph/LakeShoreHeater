@@ -31,6 +31,11 @@ class PidController:
     # TODO: implement start value
     def start(self, start_value=None):
         self.is_running = True
+        if start_value is not None:
+            print(f"setting last output to: {start_value}")
+            self.pid.set_auto_mode(enabled=False)
+            self.pid.set_auto_mode(enabled=True, last_output=start_value)
+
         if self.thread is None or not self.thread.is_alive():
             print("starting new thread")
             self.thread = threading.Thread(target=self.run, daemon=True)

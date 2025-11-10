@@ -25,7 +25,7 @@ class ActiveGui(qtw.QWidget):
         self.paused = False
         self.channels = []
         self.queue = self.controller.datahub.queue if controller else None
-        self.pid = self.controller.pid_controller if controller else None
+        self.pid_controller = self.controller.pid_controller if controller else None
 
         self.setGeometry(100, 100, 400, 0)
         # self.setWindowState(Qt.WindowMaximized)
@@ -287,23 +287,31 @@ class ActiveGui(qtw.QWidget):
 
         tuning1 = qtw.QLineEdit()
         tuning1.setAlignment(Qt.AlignCenter)
+        tuning1.setPlaceholderText("Kp")
         layout.addRow("t1", tuning1)
         tuning2 = qtw.QLineEdit()
         tuning2.setAlignment(Qt.AlignCenter)
+        tuning2.setPlaceholderText("Ki")
         layout.addRow("t2", tuning2)
         tuning3 = qtw.QLineEdit()
         tuning3.setAlignment(Qt.AlignCenter)
+        tuning3.setPlaceholderText("Kd")
         layout.addRow("t3", tuning3)
+        if self.pid_controller:
+            tuning1.setText(str(self.pid_controller.tunings[0]))
+            tuning2.setText(str(self.pid_controller.tunings[1]))
+            tuning3.setText(str(self.pid_controller.tunings[2]))
         setpoint = qtw.QLineEdit()
         setpoint.setAlignment(Qt.AlignCenter)
+        setpoint.setText("0")
         layout.addRow("setpoint", setpoint)
         apply_btn = qtw.QPushButton("Apply")
         layout.addRow("", apply_btn)
         layout.addRow("", qtw.QLabel(""))
 
-        if self.pid:
-            self.pid_active_display = qtw.QLabel("● active" if self.pid.is_running else "● inactive")
-            self.pid_active_display.setStyleSheet(f"color: {'green' if self.pid.is_running else 'red'}")
+        if self.pid_controller:
+            self.pid_active_display = qtw.QLabel("● active" if self.pid_controller.is_running else "● inactive")
+            self.pid_active_display.setStyleSheet(f"color: {'green' if self.pid_controller.is_running else 'red'}")
             self.pid_active_display.setFont(qtg.QFont("Bahnschrift", 16))
         layout.addRow(self.pid_active_display)
         start_holder = qtw.QWidget()
@@ -326,7 +334,7 @@ class ActiveGui(qtw.QWidget):
                            float(GuiHelper.get_data_from_widget(tuning3)))
                 setpoint_val = float(GuiHelper.get_data_from_widget(setpoint))
                 print(f"{tunings}, {setpoint_val}")
-                self.pid.change_settings(tunings, setpoint_val)
+                self.pid_controller.change_settings(tunings, setpoint_val)
             except ValueError:
                 print("couldn't convert inputs to floats")
             except AttributeError:
@@ -335,9 +343,9 @@ class ActiveGui(qtw.QWidget):
         apply_btn.clicked.connect(apply_settings)
 
         def update_active_display():
-            print(f"updating display with: {self.pid.is_running}")
-            self.pid_active_display.setText("● active" if self.pid.is_running else "● inactive")
-            self.pid_active_display.setStyleSheet(f"color: {'green' if self.pid.is_running else 'red'}")
+            print(f"updating display with: {self.pid_controller.is_running}")
+            self.pid_active_display.setText("● active" if self.pid_controller.is_running else "● inactive")
+            self.pid_active_display.setStyleSheet(f"color: {'green' if self.pid_controller.is_running else 'red'}")
             self.pid_active_display.setFont(qtg.QFont("Bahnschrift", 16))
 
         def start_pid():
@@ -345,15 +353,16 @@ class ActiveGui(qtw.QWidget):
                 start_val = float(GuiHelper.get_data_from_widget(start_value))
             except ValueError:
                 print("no valid start value")
+                start_val = None
             print("starting pid")
-            self.pid.start()
+            self.pid_controller.start(start_val)
             update_active_display()
 
         start_btn.clicked.connect(start_pid)
 
         def stop_pid():
             print("stopping pid")
-            self.pid.stop()
+            self.pid_controller.stop()
             update_active_display()
 
         stop_btn.clicked.connect(stop_pid)
