@@ -19,6 +19,8 @@ class LiveGraph(Process):
         self.y_axis = y_axis
         self.fig = None
         self.lines: list[plt.Line2D] = []
+        # TODO: change lines list to dict for dynamic visibility changes
+        # self.lines: dict[str, plt.Line2D] = {}
         self.running = False
 
         self.auto_xlim = True
@@ -112,6 +114,8 @@ class LiveGraph(Process):
             y_vals = self.df[self.y_axis[i]].tolist()[:val_len]
             self.lines[i].set_xdata(x_vals)
             self.lines[i].set_ydata(y_vals)
+            # TODO: use set_visible or set_data([]) to show/hide graphs (performance question), also what about legend
+            # self.lines[i].set_visible(False if i % 2 == 1 else True)
             if y_vals[-1] < self.ylim_values[0]:
                 self.ylim_values[0] = y_vals[-1]
             if y_vals[-1] > self.ylim_values[1]:
