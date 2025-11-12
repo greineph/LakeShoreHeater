@@ -63,14 +63,14 @@ class LiveGraph(Process):
                 case "data":
                     self.add_data(item[1])
                 case "op":
-                    self.execute_operation(item[1])
+                    self.execute_operation(*item[1:])
                 case _:
                     pass
 
     def add_data(self, data):
         self.df.loc[len(self.df)] = data
 
-    def execute_operation(self, op):
+    def execute_operation(self, op, content=None):
         match op:
             case Operations.ENABLE_XLIM:
                 self.auto_xlim = True
@@ -82,6 +82,8 @@ class LiveGraph(Process):
                 self.auto_ylim = False
             case Operations.CENTRE_GRAPHS:
                 self.centre_graphs()
+            case Operations.CHANGE_DISPLAYED_GRAPHS:
+                self.change_displayed_graphs(content)
             case _:
                 pass
 
@@ -96,6 +98,9 @@ class LiveGraph(Process):
         y_vals = self.df[self.y_axis]
         self.ylim_values = [y_vals.min().min(), y_vals.max().max()]
         plt.ylim(self.ylim_values[0] * 0.9, self.ylim_values[1] * 1.1)
+
+    def change_displayed_graphs(self, graphs):
+        self.y_axis = graphs
 
     def update(self):
         if self.df.empty:
@@ -135,3 +140,4 @@ class Operations(Enum):
     ENABLE_YLIM = 2
     DISABLE_YLIM = 3
     CENTRE_GRAPHS = 4
+    CHANGE_DISPLAYED_GRAPHS = 5

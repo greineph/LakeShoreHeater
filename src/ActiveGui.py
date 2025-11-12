@@ -26,6 +26,7 @@ class ActiveGui(qtw.QWidget):
         self.channels = []
         self.queue = self.controller.datahub.queue if controller else None
         self.pid_controller = self.controller.pid_controller if controller else None
+        self.graphs = {}
 
         self.setGeometry(100, 100, 400, 0)
         # self.setWindowState(Qt.WindowMaximized)
@@ -114,7 +115,7 @@ class ActiveGui(qtw.QWidget):
         mpv_tab.layout().addWidget(mpv_holder)
         tabs.addTab(mpv_tab, "MPV")
 
-        tabs.setCurrentIndex(4)
+        tabs.setCurrentIndex(3)
 
         self.show()
 
@@ -261,7 +262,7 @@ class ActiveGui(qtw.QWidget):
         centre_graph = qtw.QPushButton("Centre Graph")
         layout.addWidget(centre_graph)
 
-        def on_change(state: int, axis: str):
+        def on_change_auto_lim(state: int, axis: str):
             print(f"{axis}-axis is set to {bool(state)}")
             if self.queue is None:
                 return
@@ -272,11 +273,32 @@ class ActiveGui(qtw.QWidget):
                 op = Operations.ENABLE_YLIM if state else Operations.DISABLE_YLIM
             self.queue.put(["op", op])
 
-        auto_xlim.stateChanged.connect(lambda s, a="x": on_change(s, a))
-        auto_ylim.stateChanged.connect(lambda s, a="y": on_change(s, a))
+        auto_xlim.stateChanged.connect(lambda s, a="x": on_change_auto_lim(s, a))
+        auto_ylim.stateChanged.connect(lambda s, a="y": on_change_auto_lim(s, a))
 
-        label = qtw.QLabel("STUFF HERE")
-        layout.addWidget(label)
+        reading_names = []
+        plotting_names = []
+        for ch in (self.controller.channels if self.controller else []):
+            reading_names += ch.wanted_reading_names
+            plotting_names += ch.wanted_plotting_names
+        if self.controller:
+            reading_names += self.controller.mpv_wrapper.wanted_reading_names
+            plotting_names += self.controller.mpv_wrapper.wanted_plotting_names
+
+        def on_change_graph(state: int, key: str):
+            self.graphs[key] = bool(state)
+            print(self.graphs)
+            print([x for x in reading_names if self.graphs[x]])
+            # if self.queue:
+            #     self.queue.put(["op", Operations.CHANGE_DISPLAYED_GRAPHS, [x for x in reading_names if self.graphs[x]]])
+
+        for col in reading_names:
+            graph = qtw.QCheckBox(col, parent)
+            visible = col in plotting_names
+            graph.setChecked(visible)
+            self.graphs[col] = visible
+            layout.addWidget(graph)
+            graph.stateChanged.connect(lambda s, k=col: on_change_graph(s, k))
 
         centre_graph.clicked.connect(lambda: self.queue.put(["op", Operations.CENTRE_GRAPHS]))
 
