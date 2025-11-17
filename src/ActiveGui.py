@@ -364,11 +364,7 @@ class ActiveGui(qtw.QWidget):
 
         apply_btn.clicked.connect(apply_settings)
 
-        def update_active_display():
-            print(f"updating display with: {self.pid_controller.is_running}")
-            self.pid_active_display.setText("● active" if self.pid_controller.is_running else "● inactive")
-            self.pid_active_display.setStyleSheet(f"color: {'green' if self.pid_controller.is_running else 'red'}")
-            self.pid_active_display.setFont(qtg.QFont("Bahnschrift", 16))
+        self.pid_controller.active_display = self.pid_active_display
 
         def start_pid():
             try:
@@ -378,14 +374,12 @@ class ActiveGui(qtw.QWidget):
                 start_val = None
             print("starting pid")
             self.pid_controller.start(start_val)
-            update_active_display()
 
         start_btn.clicked.connect(start_pid)
 
         def stop_pid():
             print("stopping pid")
             self.pid_controller.stop()
-            update_active_display()
 
         stop_btn.clicked.connect(stop_pid)
 

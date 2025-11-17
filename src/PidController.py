@@ -2,25 +2,30 @@ import time
 
 from simple_pid import PID
 import threading
+from PyQt5 import QtGui as qtg
 
 
 class PidController:
 
-    def __init__(self, mpv, channel, tunings=(-1, -0.1, -0.05), interval=1):
+    def __init__(self, mpv, channel, tunings=(-1000, -10, -0), interval=1):
         self.mpv = mpv
         self.channel = channel
         self.tunings = tunings
         self.interval = interval
-        self.pid = PID(*self.tunings, setpoint=0)
+        self.pid = PID(*self.tunings, setpoint=1)
         self.pid.output_limits = (-50, 50)
         self.pid.sample_time = interval
         self.thread = None
         self.is_running = False
+        self.active_display = None
 
     def execute(self):
+        if self.mpv.get_field() <= 20:
+            self.stop()
+            return
         v = self.channel.last_reading["kelvin"]
         control = self.pid(v)
-        self.mpv.set_ramp_rate(abs(control))
+        self.mpv.set_ramp_rate(max(0.0, control))
         print(f"setting ramprate to: {control}")
 
     def run(self):
@@ -30,6 +35,7 @@ class PidController:
 
     def start(self, start_value=None):
         self.is_running = True
+        self.update_active_display()
         if start_value is not None:
             print(f"setting last output to: {start_value}")
             self.pid.set_auto_mode(enabled=False)
@@ -42,8 +48,18 @@ class PidController:
 
     def stop(self):
         self.is_running = False
+        self.update_active_display()
 
     def change_settings(self, tunings, setpoint):
         self.pid.tunings = tunings
         self.pid.setpoint = setpoint
+
+    def update_active_display(self):
+        if not self.active_display:
+            print("no active display found")
+            return
+        print(f"updating display with: {self.is_running}")
+        self.active_display.setText("● active" if self.is_running else "● inactive")
+        self.active_display.setStyleSheet(f"color: {'green' if self.is_running else 'red'}")
+        self.active_display.setFont(qtg.QFont("Bahnschrift", 16))
 
