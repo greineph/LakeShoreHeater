@@ -18,9 +18,7 @@ class LiveGraph(Process):
         self.x_axis = x_axis
         self.y_axis = y_axis
         self.fig = None
-        self.lines: list[plt.Line2D] = []
-        # TODO: change lines list to dict for dynamic visibility changes
-        # self.lines: dict[str, plt.Line2D] = {}
+        self.lines: dict[str, plt.Line2D] = {}
         self.running = False
 
         self.auto_xlim = True
@@ -48,10 +46,12 @@ class LiveGraph(Process):
         plt.ylim(0.1, 500)
         plt.xlim(0, 10)
         plt.ion()
-        for y in self.y_axis:
+        for y in list(self.df.columns)[2:]:
             ln, = ax.plot([], [])
-            self.lines.append(ln)
-        ax.legend(self.y_axis, loc="upper right")
+            self.lines[y] = ln
+            if y not in self.y_axis:
+                ln.set_visible(False)
+        ax.legend(self.df.columns[2:], loc="upper right", frameon=True, bbox_to_anchor=(1.2, 1))
         plt.tight_layout()
         plt.pause(0.1)
 
@@ -97,12 +97,18 @@ class LiveGraph(Process):
         x_vals = self.df[self.x_axis]
         plt.xlim(x_vals[0], x_vals[len(x_vals) - 1] + 5)
 
-        y_vals = self.df[self.y_axis]
+        y_vals = self.df[self.y_axis].replace(0, 1)
         self.ylim_values = [y_vals.min().min(), y_vals.max().max()]
         plt.ylim(self.ylim_values[0] * 0.9, self.ylim_values[1] * 1.1)
 
     def change_displayed_graphs(self, graphs):
         self.y_axis = graphs
+        for key in self.lines.keys():
+            if key in self.y_axis:
+                self.lines[key].set_visible(True)
+            else:
+                self.lines[key].set_visible(False)
+        plt.legend(self.df.columns[2:], loc="upper right", frameon=True, bbox_to_anchor=(1.2, 1))
 
     def update(self):
         if self.df.empty:
@@ -110,13 +116,12 @@ class LiveGraph(Process):
 
         x_vals = self.df[self.x_axis].tolist()
         val_len = len(x_vals)
-        for i in range(len(self.y_axis)):
-            y_vals = self.df[self.y_axis[i]].tolist()[:val_len]
-            self.lines[i].set_xdata(x_vals)
-            self.lines[i].set_ydata(y_vals)
-            # TODO: use set_visible or set_data([]) to show/hide graphs (performance question), also what about legend
-            # self.lines[i].set_visible(False if i % 2 == 1 else True)
-            if y_vals[-1] < self.ylim_values[0]:
+
+        for key in self.lines.keys():
+            y_vals = self.df[key].tolist()[:val_len]
+            self.lines[key].set_xdata(x_vals)
+            self.lines[key].set_ydata(y_vals)
+            if 0 < y_vals[-1] < self.ylim_values[0]:
                 self.ylim_values[0] = y_vals[-1]
             if y_vals[-1] > self.ylim_values[1]:
                 self.ylim_values[1] = y_vals[-1]

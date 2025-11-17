@@ -289,8 +289,8 @@ class ActiveGui(qtw.QWidget):
             self.graphs[key] = bool(state)
             print(self.graphs)
             print([x for x in reading_names if self.graphs[x]])
-            # if self.queue:
-            #     self.queue.put(["op", Operations.CHANGE_DISPLAYED_GRAPHS, [x for x in reading_names if self.graphs[x]]])
+            if self.queue:
+                self.queue.put(["op", Operations.CHANGE_DISPLAYED_GRAPHS, [x for x in reading_names if self.graphs[x]]])
 
         for col in reading_names:
             graph = qtw.QCheckBox(col, parent)
