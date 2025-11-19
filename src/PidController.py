@@ -18,6 +18,7 @@ class PidController:
         self.thread = None
         self.is_running = False
         self.active_display = None
+        self.display_ramp_rate = 0
 
     def execute(self):
         if self.mpv.get_field() <= 20:
@@ -27,6 +28,8 @@ class PidController:
         control = self.pid(v)
         self.mpv.set_ramp_rate(max(0.0, control))
         print(f"setting ramprate to: {control}")
+        self.display_ramp_rate = control
+        self.update_active_display()
 
     def run(self):
         while self.is_running:
@@ -58,8 +61,8 @@ class PidController:
         if not self.active_display:
             print("no active display found")
             return
-        print(f"updating display with: {self.is_running}")
-        self.active_display.setText("● active" if self.is_running else "● inactive")
+        self.active_display.setText(("● active" if self.is_running else "● inactive")
+                                    + f" ({self.display_ramp_rate:+.4f} Oe/sec)")
         self.active_display.setStyleSheet(f"color: {'green' if self.is_running else 'red'}")
         self.active_display.setFont(qtg.QFont("Bahnschrift", 16))
 
