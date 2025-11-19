@@ -117,7 +117,7 @@ class LiveGraph(Process):
         x_vals = self.df[self.x_axis].tolist()
         val_len = len(x_vals)
 
-        for key in self.lines.keys():
+        for key in self.y_axis:
             y_vals = self.df[key].tolist()[:val_len]
             self.lines[key].set_xdata(x_vals)
             self.lines[key].set_ydata(y_vals)
