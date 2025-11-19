@@ -343,9 +343,63 @@ class SettingsGui(qtw.QWidget):
         title = qtw.QLabel("MPV Settings")
         form_layout.addRow(title)
 
-        mpv_form = {}
+        mpv_form = {"readings": self.load_wanted_readings_checkboxes(form_layout, ["field", "temperature"])}
 
-        mpv_form["readings"] = self.load_wanted_readings_checkboxes(form_layout, ["field", "temperature"])
+        form_layout.addRow(qtw.QLabel(""))
+        form_layout.addRow(qtw.QLabel("Pid:"))
+        pid_form = {}
+        mpv_form["pid"] = pid_form
+
+        source = qtw.QComboBox(parent)
+        source.addItem("Channel A", Model372.InputChannel.CONTROL)
+        source.addItem("Channel 1", Model372.InputChannel.ONE)
+        source.addItem("Channel 2", Model372.InputChannel.TWO)
+        source.addItem("Channel 3", Model372.InputChannel.THREE)
+        source.addItem("Channel 4", Model372.InputChannel.FOUR)
+        source.setCurrentIndex(1)
+        form_layout.addRow("Source: ", source)
+        pid_form["source"] = source
+
+        kp = qtw.QLineEdit(parent)
+        kp.setValidator(qtg.QDoubleValidator())
+        kp.setText("-1000")
+        kp.setAlignment(Qt.AlignCenter)
+        kp.setSizePolicy(QSizePolicy.Ignored, QSizePolicy.Preferred)
+        form_layout.addRow("Kp: ", kp)
+        pid_form["kp"] = kp
+
+        ki = qtw.QLineEdit(parent)
+        ki.setValidator(qtg.QDoubleValidator())
+        ki.setText("-10")
+        ki.setAlignment(Qt.AlignCenter)
+        ki.setSizePolicy(QSizePolicy.Ignored, QSizePolicy.Preferred)
+        form_layout.addRow("Ki: ", ki)
+        pid_form["ki"] = ki
+
+        kd = qtw.QLineEdit(parent)
+        kd.setValidator(qtg.QDoubleValidator())
+        kd.setText("-0")
+        kd.setAlignment(Qt.AlignCenter)
+        kd.setSizePolicy(QSizePolicy.Ignored, QSizePolicy.Preferred)
+        form_layout.addRow("Kd: ", kd)
+        pid_form["kd"] = kd
+
+        target = qtw.QLineEdit(parent)
+        target.setValidator(qtg.QDoubleValidator())
+        target.setText("1")
+        target.setAlignment(Qt.AlignCenter)
+        target.setSizePolicy(QSizePolicy.Ignored, QSizePolicy.Preferred)
+        form_layout.addRow("Target: ", target)
+        pid_form["target"] = target
+
+        max_rate = qtw.QSpinBox(parent)
+        max_rate.setRange(0, 1000)
+        max_rate.setValue(50)
+        max_rate.setSuffix(" 0e/s")
+        max_rate.setButtonSymbols(qtw.QAbstractSpinBox.ButtonSymbols.NoButtons)
+        max_rate.setAlignment(Qt.AlignCenter)
+        form_layout.addRow("Max ΔB: ", max_rate)
+        pid_form["max_rate"] = max_rate
 
         self.mpv_form = mpv_form
 
