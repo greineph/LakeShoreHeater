@@ -80,6 +80,7 @@ class LiveGraph(Process):
                 self.auto_xlim = False
             case Operations.ENABLE_YLIM:
                 self.auto_ylim = True
+                self.centre_graphs()
             case Operations.DISABLE_YLIM:
                 self.auto_ylim = False
             case Operations.CENTRE_GRAPHS:

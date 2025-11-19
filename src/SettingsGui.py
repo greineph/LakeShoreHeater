@@ -463,6 +463,7 @@ class SettingsGui(qtw.QWidget):
         if len(save_path) == 0:
             return
         StartupHandler.Data.path_export = save_path
+        StartupHandler.Data.path_import = save_path
         StartupHandler.save_settings()
 
         settings = {"channels": [],
@@ -532,6 +533,7 @@ class SettingsGui(qtw.QWidget):
         if len(save_path) == 0:
             return
         StartupHandler.Data.path_import = save_path
+        StartupHandler.Data.path_export = save_path
         StartupHandler.save_settings()
 
         with open(save_path, "r") as file:
