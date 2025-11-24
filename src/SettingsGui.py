@@ -642,6 +642,11 @@ class SettingsGui(qtw.QWidget):
             reading_form["plot"].setChecked(reading_settings["plot"])
             reading_form["custom_name"].setText(reading_settings["custom_name"])
 
+        try:
+            GuiHelper.cascade_change_with_data(mpv_form["pid"], mpv_settings["pid"])
+        except KeyError:
+            pass
+
         self.logging_form["interval"].setValue(settings["logging"]["interval"])
 
 

@@ -57,3 +57,21 @@ def change_widget_with_data(widget: qtw.QWidget, data):
             widget.setValue(data)
         case _:
             pass
+
+def cascade_change_with_data(obj, data):
+    if isinstance(obj, qtw.QWidget):
+        change_widget_with_data(obj, data)
+    elif isinstance(obj, list) and isinstance(data, list):
+        for i in range(len(obj)):
+            try:
+                cascade_change_with_data(obj[i], data[i])
+            except IndexError:
+                pass
+    elif isinstance(obj, dict) and isinstance(data, dict):
+        for k, v in obj.items():
+            try:
+                cascade_change_with_data(v, data[k])
+            except KeyError:
+                pass
+    else:
+        pass
