@@ -34,6 +34,16 @@ def get_save_data_from_widget(widget: qtw.QWidget):
         case _:
             return None
 
+def cascade_get_save_data(obj):
+    if isinstance(obj, qtw.QWidget):
+        return get_save_data_from_widget(obj)
+    elif isinstance(obj, list):
+        return [cascade_get_save_data(x) for x in obj]
+    elif isinstance(obj, dict):
+        return {k: cascade_get_save_data(v) for k, v in obj.items()}
+    else:
+        return None
+
 
 def change_widget_with_data(widget: qtw.QWidget, data):
     match type(widget):

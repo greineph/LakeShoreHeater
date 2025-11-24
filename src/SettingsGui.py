@@ -571,7 +571,10 @@ class SettingsGui(qtw.QWidget):
                                  "plot": reading["plot"].isChecked(),
                                  "custom_name": reading["custom_name"].text()})
 
-        settings["mpv"] = {"readings": mpv_readings}
+        print(self.mpv_form)
+        settings["mpv"] = {"readings": mpv_readings,
+                           "pid": GuiHelper.cascade_get_save_data(self.mpv_form["pid"])}
+        print(settings["mpv"])
 
         settings["logging"] = {"interval": self.logging_form["interval"].value()}
 
