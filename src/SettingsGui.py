@@ -502,6 +502,15 @@ class SettingsGui(qtw.QWidget):
 
         self.controller.logging_interval = self.logging_form["interval"].value()
 
+        pid_form = self.mpv_form["pid"]
+        source = GuiHelper.get_data_from_widget(pid_form["source"])
+        tunings = (float(GuiHelper.get_data_from_widget(pid_form["kp"])),
+                   float(GuiHelper.get_data_from_widget(pid_form["ki"])),
+                   float(GuiHelper.get_data_from_widget(pid_form["kd"])))
+        target = float(GuiHelper.get_data_from_widget(pid_form["target"]))
+        max_rate = GuiHelper.get_data_from_widget(pid_form["max_rate"])
+        self.controller.create_pid_controller(source, tunings, target, max_rate)
+
         self.controller.ready = True
         self.close()
 

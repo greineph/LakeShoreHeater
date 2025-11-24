@@ -35,11 +35,6 @@ class Controller:
                                append_to_file=self.append_to_file,
                                controller=self)
         self.provide_dependencies()
-        try:
-            self.pid_controller = PidController(mpv=self.mpv_wrapper,
-                                                channel=self.channels[0])
-        except Exception:
-            print("something wrong with pid instantiation")
 
     # starts the process
     def start(self):
@@ -73,4 +68,11 @@ class Controller:
     def provide_dependencies(self):
         for ch in self.channels:
             ch.functionality.provide_dependencies(self)
+
+    def create_pid_controller(self, source, tunings, target, max_rate):
+        self.pid_controller = PidController(mpv=self.mpv_wrapper,
+                                            channel=next(ch for ch in self.channels if ch.input_channel == source),
+                                            tunings=tunings,
+                                            target=target,
+                                            max_rate=max_rate)
 
