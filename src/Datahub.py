@@ -98,6 +98,8 @@ class Datahub:
                 if not self.heater_logging_strategy["active"]:
                     self.heater_logging_strategy["active"] = True
                     self.heater_logging_strategy["index"] += 1
+                    with open(os.path.abspath(os.path.join(self.heater_logging_strategy["path"], str(self.heater_logging_strategy["index"]) + ".adr")), "a") as file:
+                        file.write(",".join(self.df.columns) + "\n")
                 with open(os.path.abspath(os.path.join(self.heater_logging_strategy["path"], str(self.heater_logging_strategy["index"]) + ".adr")), "a") as file:
                     file.write(",".join([str(i) for i in data]) + "\n")
             else:
