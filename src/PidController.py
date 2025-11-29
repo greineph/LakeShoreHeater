@@ -15,7 +15,7 @@ class PidController:
         self.max_rate = max_rate
         self.interval = interval
         self.pid = PID(*self.tunings, setpoint=self.target)
-        self.pid.output_limits = (-50, 50)
+        self.pid.output_limits = (-max_rate, max_rate)
         self.pid.sample_time = interval
         self.thread = None
         self.is_running = False
@@ -31,7 +31,6 @@ class PidController:
         v = self.channel.last_reading["kelvin"]
         control = self.pid(v)
         self.mpv.set_ramp_rate(max(0.0, control))
-        print(f"setting ramprate to: {control}")
         self.display_ramp_rate = control
         self.update_active_display()
 

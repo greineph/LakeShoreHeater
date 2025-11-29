@@ -189,7 +189,6 @@ class SettingsGui(qtw.QWidget):
 
         def on_channel_changed(value=0):
             quad_boxes = channel_form["readings"][3]
-            print(f"old: {channel_form['prev_channel']}, new: {value}")
             if value == 0 and channel_form["prev_channel"] != 0:
                 quad_boxes["log"].setEnabled(False)
                 quad_boxes["plot"].setEnabled(False)
@@ -214,7 +213,6 @@ class SettingsGui(qtw.QWidget):
 
         def on_excitation_mode_changed(value=0):
             excitation_range.clear()
-            print("changed ex mode")
             if value == 0:  # current
                 if channel.currentIndex() == 0:
                     for x in Model372.ControlInputCurrentRange:
@@ -231,8 +229,6 @@ class SettingsGui(qtw.QWidget):
         excitation_mode.currentIndexChanged.connect(on_excitation_mode_changed)
 
         def on_functionality_changed():
-            print("try change func")
-            print(channel_form["functionality_form"])
             func_form = channel_form["functionality_form"]
             old_form = func_form[func_form["old_value"]]
             new_form = func_form[channel_form["functionality"].currentData()]
@@ -240,7 +236,6 @@ class SettingsGui(qtw.QWidget):
             for item in old_form.items():
                 form_layout.labelForField(item[1]).setVisible(False)
                 item[1].setVisible(False)
-            print("all destroyed")
             for item in new_form.items():
                 form_layout.labelForField(item[1]).setVisible(True)
                 item[1].setVisible(True)
@@ -437,11 +432,9 @@ class SettingsGui(qtw.QWidget):
 
         if GuiHelper.get_data_from_widget(self.logging_form["append"]):
             save_path = qtw.QFileDialog.getOpenFileName(self, "Save", path)[0]
-            print(save_path)
             self.controller.append_to_file = True
         else:
             save_path = qtw.QFileDialog.getSaveFileName(self, "Save", path)[0]
-            print(save_path)
             self.controller.append_to_file = False
         self.controller.save_path = save_path
 
@@ -486,7 +479,6 @@ class SettingsGui(qtw.QWidget):
             print(functionality)
 
             self.controller.create_channel(channel_settings, functionality)
-            # print(channel_settings.create_channel(Device.get_device()))
 
         mpv_readings = []
         for reading in self.mpv_form["readings"]:
@@ -571,10 +563,8 @@ class SettingsGui(qtw.QWidget):
                                  "plot": reading["plot"].isChecked(),
                                  "custom_name": reading["custom_name"].text()})
 
-        print(self.mpv_form)
         settings["mpv"] = {"readings": mpv_readings,
                            "pid": GuiHelper.cascade_get_save_data(self.mpv_form["pid"])}
-        print(settings["mpv"])
 
         settings["logging"] = {"interval": self.logging_form["interval"].value()}
 

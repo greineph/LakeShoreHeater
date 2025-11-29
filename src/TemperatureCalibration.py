@@ -614,6 +614,7 @@ def cal_UTQ13(resistance):
         return np.nan
     return t
 
+
 def cal_UTCC_1A(resistance):
     if resistance > 29959:
         return np.nan
@@ -640,6 +641,7 @@ def cal_UTCC_1A(resistance):
     if t < 0.0248 or t > 2.05:
         return np.nan
     return t
+
 
 def cal_UTCC_2A(resistance):
     if resistance > 27328.6:
@@ -744,6 +746,7 @@ def cal_ser6(x):
     return np.exp(
         -418.66269190557 + 2030.22369066585 * x - 4302.49551086799 * x ** 2 + 5133.14952507189 * x ** 3 - 3719.23040793288 * x ** 4 + 1605.56403609629 * x ** 5 - 332.397935938044 * x ** 6 - 23.0801113001037 * x ** 7 + 26.8652824936315 * x ** 8 - 1.88491652328337 * x ** 9 - 2.21422793002565 * x ** 10 + 0.813246835982012 * x ** 11 - 0.129335143412473 * x ** 12 + 0.0100828066451444 * x ** 13 - 3.06270610070887E-4 * x ** 14)
 
+
 # TODO: remove deprecated functions and migrate coded ones to json
 functions = {"None": lambda x: x,
              "cal_RX202A": cal_RX202A,
@@ -794,6 +797,7 @@ def to_function(parameters: dict):
 
     return func
 
+
 # generates calibration functions from all json files in calibrations folder
 def generate_functions_from_files():
     path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "calibrations"))
@@ -801,17 +805,14 @@ def generate_functions_from_files():
         print("no calibrations folder found")
         return
 
-    calibrations = {}
-    print(os.listdir(path))
     for f in os.listdir(path):
         with open(os.path.join(path, f), "r") as file:
             if not file.name.endswith(".json"):
                 continue
             s = "".join(file.readlines())
             params = json.loads(s)
-        print(params)
         func = to_function(params)
         functions[params["name"]] = func
-    print(functions)
+
 
 generate_functions_from_files()
