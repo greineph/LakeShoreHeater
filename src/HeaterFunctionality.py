@@ -155,7 +155,6 @@ class HeaterFunctionality(AbstractFunctionality):
 
         if self.power_display:
             self.power_display.setText(f"Heater ({self.channel.last_reading['power']}W)")
-            print("changing power display")
 
     def load_active_gui(self, parent):
         parent.setLayout(qtw.QVBoxLayout())
@@ -171,7 +170,7 @@ class HeaterFunctionality(AbstractFunctionality):
         parent.layout().addWidget(title_holder)
         form_holder = qtw.QWidget()
         form_holder.setLayout(qtw.QFormLayout())
-        form = load_gui_elements(form_holder)
+        form = load_gui_elements(form_holder, self)
         parent.layout().addWidget(form_holder)
 
         apply_btn = qtw.QPushButton("Apply")
@@ -210,7 +209,7 @@ class HeaterFunctionality(AbstractFunctionality):
         apply_btn.clicked.connect(apply_settings)
 
 
-def load_gui_elements(parent: qtw.QWidget):
+def load_gui_elements(parent: qtw.QWidget, functionality: HeaterFunctionality=None):
     layout = parent.layout()
     form = {}
     if not isinstance(layout, qtw.QFormLayout):
@@ -310,7 +309,19 @@ def load_gui_elements(parent: qtw.QWidget):
     use_stability.stateChanged.connect(on_use_stability_change)
     on_use_stability_change(False)
 
+    if functionality:
+        use_threshold.setChecked(functionality.use_threshold)
+        activation_threshold.setValue(functionality.activation_threshold)
+        deactivation_threshold.setValue(functionality.deactivation_threshold)
+        use_stability.setChecked(functionality.use_stability)
+        number_of_values.setValue(functionality.number_of_values)
+        deviation.setValue(functionality.deviation)
+        max_threshold.setValue(functionality.max_threshold)
+        active_excitation.setCurrentIndex(functionality.active_excitation - 1)  # -1 cause some people cant count from 0
+        interval.setValue(functionality.interval)
+
     return form
+
 
 def extract_data(gui_elements):
     data = {}
