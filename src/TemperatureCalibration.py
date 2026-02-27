@@ -561,9 +561,9 @@ def cal_UTC1kC01(resistance):
 
 
 def cal_UTC1kC04(resistance):
-    if resistance > 1440:
+    if resistance > 8463:
         return np.nan
-    if resistance < 8463:
+    if resistance < 1440:
         return np.nan
     x = 11.2 - np.log(resistance - 1400)
     t = np.exp(
