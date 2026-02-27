@@ -723,6 +723,61 @@ def cal_UTCC_2A(resistance):
     return
 
 
+def cal_UTC_1k_C12T(resistance):
+    if resistance > 10393.0:
+        return np.nan
+    if resistance < 1312.0:
+        return np.nan
+    x = 10.0 - np.log(resistance - 900.0)
+    t = np.exp(
+        + 45.3365864301086
+        - 279.642561075845 * x
+        + 676.778403787487 * x ** 2
+        - 906.341021564213 * x ** 3
+        + 716.889032092528 * x ** 4
+        - 307.885408127709 * x ** 5
+        + 25.9388283393073 * x ** 6
+        + 46.2285104814483 * x ** 7
+        - 26.3795840825958 * x ** 8
+        + 5.92575268688633 * x ** 9
+        - 0.0561746958805483 * x ** 10
+        - 0.292974257973497 * x ** 11
+        + 0.0719916083446297 * x ** 12
+        - 0.0076773027755517 * x ** 13
+        + 3.23672511500012E-4 * x ** 14)
+
+    if t < 0.02574 or t > 7.897:
+        return np.nan
+    return t
+
+
+def cal_UTQ18(resistance):
+    if resistance > 75000:
+        return np.nan
+    if resistance < 2600:
+        return np.nan
+    x = 11.2 - np.log(resistance - 1400)
+    t = np.exp(
+        -3.41561105286733
+        + 1.12232262100456 * x
+        - 0.424826792708624 * x ** 2
+        + 0.773936136233403 * x ** 3
+        - 1.30027361857579 * x ** 4
+        + 2.31533923175192 * x ** 5
+        - 3.80146857723503 * x ** 6
+        + 4.6076088750048 * x ** 7
+        - 3.78157095811825 * x ** 8
+        + 2.08130218771598 * x ** 9
+        - 0.768258026046223 * x ** 10
+        + 0.187580821614454 * x ** 11
+        - 0.0290504854757618 * x ** 12
+        + 0.00258383342636628 * x ** 13
+        - 1.00501530690684E-4 * x ** 14)
+    if t < 0.035 or t > 6.2:
+        return np.nan
+    return t
+
+
 def cal_ht1(x):
     if x < 4600:
         return np.nan
@@ -803,36 +858,38 @@ def cal_ser6(x):
 functions = {"None": lambda x: x,
              "cal_RX202A": cal_RX202A,
              "cal_RX202A_ULT": cal_RX202A_ULT,
-             "cal_CHE5": cal_CHE5,
-             "cal_III": cal_III,
-             "cal_VII": cal_VII,
-             "cal_VIII": cal_VIII,
-             "cal_XII": cal_XII,
-             "cal_XIII": cal_XIII,
-             "cal_XIV": cal_XIV,
-             "cal_UTQ1": cal_UTQ1,
-             "cal_UTQ2": cal_UTQ2,
-             "cal_UTQ4": cal_UTQ4,
-             "cal_UTQ5": cal_UTQ5,
-             "cal_UTQ8": cal_UTQ8,
-             "cal_UTQ9": cal_UTQ9,
-             "cal_ht1": cal_ht1,
-             "cal_ht2": cal_ht2,
+#             "cal_CHE5": cal_CHE5,
+#             "cal_III": cal_III,
+#             "cal_VII": cal_VII,
+#             "cal_VIII": cal_VIII,
+#             "cal_XII": cal_XII,
+#             "cal_XIII": cal_XIII,
+#             "cal_XIV": cal_XIV,
+#             "cal_UTQ1": cal_UTQ1,
+#             "cal_UTQ2": cal_UTQ2,
+#             "cal_UTQ4": cal_UTQ4,
+#             "cal_UTQ5": cal_UTQ5,
+#             "cal_UTQ8": cal_UTQ8,
+#             "cal_UTQ9": cal_UTQ9,
+             "UTQ18":cal_UTQ18,
+#             "cal_ht1": cal_ht1,
+#             "cal_ht2": cal_ht2,
              "cal_ht3": cal_ht3,
              "cal_generic_pt1000": cal_generic_pt1000,
-             "cal_pt1000_Ch1_Baffle5": cal_pt1000_Ch1_Baffle5,
-             "cal_pt1000_Ch2_Baffle4": cal_pt1000_Ch2_Baffle4,
+#             "cal_pt1000_Ch1_Baffle5": cal_pt1000_Ch1_Baffle5,
+#             "cal_pt1000_Ch2_Baffle4": cal_pt1000_Ch2_Baffle4,
              "cal_pt1000": cal_pt1000,
-             "cal_cam_cool": cal_cam_cool,
-             "cal_ser8": cal_ser8,
-             "cal_ser6": cal_ser6,
+#             "cal_cam_cool": cal_cam_cool,
+#             "cal_ser8": cal_ser8,
+#             "cal_ser6": cal_ser6,
              "cal_UTC1kB01": cal_UTC1kB01,
              "cal_UTC1kB02": cal_UTC1kB02,
              "cal_UTC1kC01": cal_UTC1kC01,
              "cal_UTQ13": cal_UTQ13,
              "cal_UTCC_1A": cal_UTCC_1A,
              "cal_UTCC_2A": cal_UTCC_2A,
-             "UTC1kC04": cal_UTC1kC04}
+             "UTC1k_C12T" : cal_UTC_1k_C12T,
+             "UTC1k_C04": cal_UTC1kC04}
 
 
 # returns the cal function for the given parameters
