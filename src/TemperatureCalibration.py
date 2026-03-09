@@ -640,6 +640,34 @@ def cal_UTC1kB02(resistance):
     return t
 
 
+def cal_UTC1kC21T(resistance):
+    if resistance > 6900:
+        return np.nan
+    if resistance < 1362:
+        return np.nan
+    x = 11.2 - np.log(resistance - 900)
+    t = np.exp(
+        - 16771.6576014375
+        + 33473.0514051733 * x
+        - 28942.5255684269 * x ** 2
+        + 15425.5094917956 * x ** 3
+        - 6646.42089607775 * x ** 4
+        + 2557.01534876014 * x ** 5
+        - 657.808491358122 * x ** 6
+        + 12.556838811375 * x ** 7
+        + 57.3246336204476 * x ** 8
+        - 19.8616445725145 * x ** 9
+        + 2.83538348554712 * x ** 10
+        - 0.0593426799117787 * x ** 11
+        - 0.0359373201985764 * x ** 12
+        + 0.00459141504028872 * x ** 13
+        - 1.83087615946363E-4 * x **  14)
+
+    if t < 0.072 or t > 6:
+        return np.nan
+    return t
+
+
 def cal_UTQ13(resistance):
     if resistance > 20330:
         return np.nan
@@ -889,7 +917,8 @@ functions = {"None": lambda x: x,
              "cal_UTCC_1A": cal_UTCC_1A,
              "cal_UTCC_2A": cal_UTCC_2A,
              "UTC1k_C12T" : cal_UTC_1k_C12T,
-             "UTC1k_C04": cal_UTC1kC04}
+             "UTC1k_C04": cal_UTC1kC04,
+             "cal_UTC1kC21T":cal_UTC1kC21T}
 
 
 # returns the cal function for the given parameters
