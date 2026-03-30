@@ -17,7 +17,7 @@ import FunctionalityFunctions
 from UliEngineering.Electronics.Resistors import resistor_tolerance
 from lakeshore import Model372
 
-from src.Device import Device
+from src.Device import Device, ConnectionMode
 from src.TemperatureCalibrationGui import TemperatureCalibrationGui
 
 
@@ -297,14 +297,44 @@ class SettingsGui(qtw.QWidget):
 
         lakeshore_form = {}
 
+        use_ip_address = qtw.QCheckBox()
+        use_ip_address.setChecked(True)
+        form_layout.addRow("use ip", use_ip_address)
+        lakeshore_form["use_ip"] = use_ip_address
+
         ip_address = qtw.QLineEdit(parent)
         ip_address.setInputMask("000.000.0.00;_")
         ip_address.setText("192.168.0.12")
         ip_address.setAlignment(Qt.AlignCenter)
         ip_address.setMaximumWidth(190)
-
         form_layout.addRow("ip: ", ip_address)
         lakeshore_form["ip"] = ip_address
+
+        use_usb = qtw.QCheckBox()
+        form_layout.addRow("use usb", use_usb)
+        lakeshore_form["use_usb"] = use_usb
+
+        baud_rate = qtw.QLineEdit(parent)
+        baud_rate.setValidator(qtg.QIntValidator())
+        baud_rate.setText("57600")
+        baud_rate.setEnabled(False)
+        form_layout.addRow("baud rate: ", baud_rate)
+        lakeshore_form["baud_rate"] = baud_rate
+
+        def on_change(i, ip, usb):
+            if ip and use_ip_address.isChecked() or usb and not use_usb.isChecked():
+                use_ip_address.setChecked(True)
+                ip_address.setEnabled(True)
+                use_usb.setChecked(False)
+                baud_rate.setEnabled(False)
+            elif ip and not use_ip_address.isChecked() or usb and use_usb.isChecked():
+                use_ip_address.setChecked(False)
+                ip_address.setEnabled(False)
+                use_usb.setChecked(True)
+                baud_rate.setEnabled(True)
+
+        use_usb.stateChanged.connect(lambda i, ip=False, usb=True: on_change(i, ip, usb))
+        use_ip_address.stateChanged.connect(lambda i, ip=True, usb=False: on_change(i, ip, usb))
 
         filter = qtw.QCheckBox(parent)
         filter.setChecked(True)
@@ -443,12 +473,17 @@ class SettingsGui(qtw.QWidget):
         StartupHandler.Data.path_log = save_path
         StartupHandler.save_settings()
 
+        print("connecting to lakeshore")
+        connection_mode = ConnectionMode.USB_MODE if GuiHelper.get_save_data_from_widget(self.lakeshore_form["use_usb"]) else ConnectionMode.IP_MODE
         self.controller.configure_lakeshore(ip=GuiHelper.get_data_from_widget(self.lakeshore_form["ip"]),
+                                            baud_rate=int(GuiHelper.get_data_from_widget(self.lakeshore_form["baud_rate"])),
+                                            connection_mode=connection_mode,
                                             state=GuiHelper.get_data_from_widget(self.lakeshore_form["state"]),
                                             settle_time=GuiHelper.get_data_from_widget(
                                                 self.lakeshore_form["settle_time"]),
                                             window=GuiHelper.get_data_from_widget(self.lakeshore_form["window"]))
 
+        print("creating channels")
         for channel_form in self.channel_forms:
             readings = []
             for reading in channel_form["readings"]:
@@ -468,18 +503,14 @@ class SettingsGui(qtw.QWidget):
                                                units=channel_form["units"].currentData(),
                                                resistance_range=channel_form["resistance_range"].currentData(),
                                                readings=readings)
-            print(channel_settings)
             func = GuiHelper.get_data_from_widget(channel_form["functionality"])
-            print(func)
             func_form = channel_form["functionality_form"][func]
-            print(func_form)
             functionality_data = FunctionalityFunctions.functions[func]["extract"](func_form)
-            print(functionality_data)
             functionality = FunctionalityFunctions.functions[func]["create"](functionality_data)
-            print(functionality)
 
             self.controller.create_channel(channel_settings, functionality)
 
+        print("connecting to mpv")
         mpv_readings = []
         for reading in self.mpv_form["readings"]:
             if reading["log"].isChecked():

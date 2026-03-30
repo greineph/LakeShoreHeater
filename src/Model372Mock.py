@@ -29,7 +29,7 @@ class Model372Mock(Model372):
 
     def configure_input(self, input_channel, settings):
         print("configuring input")
-        print(f"channel {input_channel},\n{vars(settings)}")
+        print(f"channel {input_channel}, {vars(settings)}")
         pass
 
     def get_input_setup_parameters(self, input_channel):

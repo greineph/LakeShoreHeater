@@ -56,11 +56,11 @@ class Controller:
         channel.add_functionality(functionality)
         self.channels.append(channel)
 
-    def configure_lakeshore(self, ip, state, settle_time, window):
+    def configure_lakeshore(self, ip, baud_rate, connection_mode, state, settle_time, window):
         Device.ip_address = ip
-        print("setting filter")
+        Device.baud_rate = baud_rate
+        Device.mode = connection_mode
         Device.get_device().set_filter(0, state, settle_time, window)
-        print(Device.get_device().get_filter(1))
 
     def create_mpv_wrapper(self, settings: MPVSettings):
         self.mpv_wrapper = settings.create_mpv_wrapper()
